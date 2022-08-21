@@ -21,6 +21,8 @@ class ReservationDetails extends StatefulWidget {
 }
 
 class _ReservationDetailsState extends State<ReservationDetails> {
+  // bool
+  bool isLoading = true;
   // FORM DATA
   late String name = fireData['name'];
   late String lastName = fireData['lastname'];
@@ -49,6 +51,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   late Map<String, dynamic> fireData = {};
 
   getData() async {
+    isLoading = true;
     final docRef = _firestore
         .collection('reservation')
         .where('sender', isEqualTo: loggedInUser.email)
@@ -58,6 +61,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         final data = snapshot.docs.forEach((DocumentSnapshot doc) {
           setState(() {
             fireData = doc.data() as Map<String, dynamic>;
+            isLoading = false;
           });
         });
       },
@@ -90,33 +94,19 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         });
   }
 
-  void _printLatestValue1() {
-    print('Second text field: ${_controller1.text}');
-  }
-
-  void _printLatestValue2() {
-    print('Second text field: ${_controller2.text}');
-  }
-
   @override
   void initState() {
     super.initState();
     getCurrentUser();
     getData();
-    _controller1.addListener(() {
-      _printLatestValue1();
-    });
-    _controller2.addListener(() {
-      _printLatestValue2();
-    });
   }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is removed from the widget tree.
-    // This also removes the _printLatestValue listener.
+
     _controller1.dispose();
-    // This also removes the _printLatestValue listener.
+
     _controller2.dispose();
     super.dispose();
   }
@@ -135,111 +125,116 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             child: const Icon(Icons.clear),
           ),
         ],
-        title: Text('Reservation Details'),
+        title: const Text('Reservation Details'),
       ),
       backgroundColor: Colors.white,
-      body: Align(
-        alignment: Alignment.center,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextFieldWidget(
-                text: 'Last name: $name',
-                controller: _controller1,
-                newValue: (value) {
-                  name = value!;
-                },
-              ),
-              TextFieldWidget(
-                text: 'Last name: $lastName',
-                controller: _controller2,
-                newValue: (value) {
-                  lastName = value!;
-                },
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  onTap: () async {
-                    DateTime? newDate = await showDatePicker(
-                      context: context,
-                      initialDate: reservationDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2023),
-                      /* selectableDayPredicate: (DateTime day) =>
+      body: isLoading
+          ? const SpinKitChasingDots(
+              color: Colors.black,
+              duration: Duration(seconds: 3),
+            )
+          : Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextFieldWidget(
+                      text: 'Last name: $name',
+                      controller: _controller1,
+                      newValue: (value) {
+                        name = value!;
+                      },
+                    ),
+                    TextFieldWidget(
+                      text: 'Last name: $lastName',
+                      controller: _controller2,
+                      newValue: (value) {
+                        lastName = value!;
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                        onTap: () async {
+                          DateTime? newDate = await showDatePicker(
+                            context: context,
+                            initialDate: reservationDate,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2023),
+                            /* selectableDayPredicate: (DateTime day) =>
                         day.weekday == 6 || day.weekday == 7 ? false : true, */
-                    );
-                    setState(() {
-                      reservationDate = newDate!;
-                    });
-                  },
-                  child: Text(
-                    'Date: ${reservationDate.day}/${reservationDate.month}/${reservationDate.year}',
-                    style: const TextStyle(fontSize: 20.0),
-                  ),
-                ),
-              ),
-              /* Text(
+                          );
+                          setState(() {
+                            reservationDate = newDate!;
+                          });
+                        },
+                        child: Text(
+                          'Date: ${reservationDate.day}/${reservationDate.month}/${reservationDate.year}',
+                          style: const TextStyle(fontSize: 20.0),
+                        ),
+                      ),
+                    ),
+                    /* Text(
                 'Reservation Date: ${reservationDate.day}.${reservationDate.month}.${reservationDate.year}',
                 style: kReservationDetails,
               ), */
-              // RESERVATION TIME
-              DropdownButton(
-                  value: reservationTime,
-                  icon: const Icon(
-                    Icons.arrow_downward,
-                    color: Colors.purple,
-                  ),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.purple),
-                  underline: Container(
-                    color: Colors.transparent,
-                  ),
-                  items: dropdownButtonList
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Container(
-                          child: Text(
-                        value,
-                        style: const TextStyle(fontSize: 20.0),
-                      )),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      reservationTime = newValue!;
-                      print(reservationTime);
-                    });
-                  }),
-              /* Text(
+                    // RESERVATION TIME
+                    DropdownButton(
+                        value: reservationTime,
+                        icon: const Icon(
+                          Icons.arrow_downward,
+                          color: Colors.purple,
+                        ),
+                        elevation: 16,
+                        style: const TextStyle(color: Colors.purple),
+                        underline: Container(
+                          color: Colors.transparent,
+                        ),
+                        items: dropdownButtonList
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Container(
+                                child: Text(
+                              value,
+                              style: const TextStyle(fontSize: 20.0),
+                            )),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            reservationTime = newValue!;
+                            print(reservationTime);
+                          });
+                        }),
+                    /* Text(
                 'Reservation Time: $reservationTime',
                 style: kReservationDetails,
               ), */
 // UPDATE BUTTON
-              RoundedButton(
-                  color: Colors.purple,
-                  title: 'Change Reservation',
-                  onPressed: () {
-                    updateData();
-                  }),
+                    RoundedButton(
+                        color: Colors.purple,
+                        title: 'Change Reservation',
+                        onPressed: () {
+                          updateData();
+                        }),
 
-              // DELETE BUTTON
-              RoundedButton(
-                  color: Colors.red,
-                  title: 'Delete Reservation',
-                  onPressed: () {
-                    _controller1.clear();
-                    _controller2.clear();
-                    //deleteData();
-                  })
-            ],
-          ),
-        ),
-      ),
+                    // DELETE BUTTON
+                    RoundedButton(
+                        color: Colors.red,
+                        title: 'Delete Reservation',
+                        onPressed: () {
+                          _controller1.clear();
+                          _controller2.clear();
+                          //deleteData();
+                        })
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
