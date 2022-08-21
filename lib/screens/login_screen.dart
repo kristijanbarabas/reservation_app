@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
-import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             child: const Icon(Icons.arrow_back)),
         automaticallyImplyLeading: false,
-        title: Text(kLoginTitle),
+        title: const Text(kLoginTitle),
         centerTitle: true,
         backgroundColor: Colors.purple,
       ),
@@ -71,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
+              googleFonts: kGoogleFonts,
               color: Colors.red,
               title: kLoginTitle,
               onPressed: () async {
@@ -82,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushNamed(context, ReservationDetails.id);
                   }
                 } catch (e) {
-                  print(e);
+                  Alert(context: context, title: "Error", desc: "Try again!")
+                      .show();
                 }
               },
             ),

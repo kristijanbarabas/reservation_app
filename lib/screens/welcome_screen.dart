@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/login_screen.dart';
@@ -15,12 +16,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final colorizeColors = [
-    Colors.purple,
-    Colors.blue,
-    Colors.yellow,
-    Colors.red,
-  ];
   String welcomeScreenTitle = 'STUDIO ASTRID';
 
   @override
@@ -38,7 +33,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 SizedBox(
                   child: AnimatedTextKit(
-                    repeatForever: true,
                     animatedTexts: [
                       ColorizeAnimatedText(
                         welcomeScreenTitle,
@@ -57,15 +51,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
-                color: Colors.red,
+                color: color1,
                 title: kLoginTitle,
+                googleFonts: kGoogleFonts,
                 onPressed: () {
                   Navigator.pushNamed(context, LoginScreen.id);
                 }),
             // REGISTER BUTTON
             RoundedButton(
-                color: Colors.purple,
+                color: color2,
                 title: kRegisterTitle,
+                googleFonts: kGoogleFonts,
                 onPressed: () {
                   Navigator.pushNamed(context, RegistrationScreen.id);
                 })

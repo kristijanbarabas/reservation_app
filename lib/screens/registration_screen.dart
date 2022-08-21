@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/screens/reservation_screen.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -71,6 +73,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
+              googleFonts: GoogleFonts.dynalight(),
               color: Colors.red,
               title: kRegisterTitle,
               onPressed: () async {
@@ -82,7 +85,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     Navigator.pushNamed(context, ReservationScreen.id);
                   }
                 } catch (e) {
-                  print(e);
+                  Alert(context: context, title: "Error", desc: "Try again!")
+                      .show();
                 }
               },
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
@@ -174,6 +175,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
             const SizedBox(),
             // SUBMIT BUTTON
             RoundedButton(
+                googleFonts: kGoogleFonts,
                 color: Colors.purple,
                 title: kSubmit,
                 onPressed: () {

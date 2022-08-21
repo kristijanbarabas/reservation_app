@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
@@ -87,7 +88,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           querySnapshot.docs[0].reference.set({
             'name': name,
             'lastname': lastName,
-            'timestamp': timestamp,
+            'timestamp': reservationDate,
             'time': reservationTime,
             'sender': loggedInUser.email
           })
@@ -116,6 +117,12 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, LoginScreen.id);
+            },
+            child: Icon(Icons.arrow_back)),
         actions: [
           GestureDetector(
             onTap: () {
@@ -142,7 +149,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TextFieldWidget(
-                      text: 'Last name: $name',
+                      text: 'Name: $name',
                       controller: _controller1,
                       newValue: (value) {
                         name = value!;
@@ -164,8 +171,10 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                             initialDate: reservationDate,
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2023),
-                            /* selectableDayPredicate: (DateTime day) =>
-                        day.weekday == 6 || day.weekday == 7 ? false : true, */
+                            selectableDayPredicate: (DateTime day) =>
+                                day.weekday == 6 || day.weekday == 7
+                                    ? false
+                                    : true,
                           );
                           setState(() {
                             reservationDate = newDate!;
@@ -177,10 +186,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                         ),
                       ),
                     ),
-                    /* Text(
-                'Reservation Date: ${reservationDate.day}.${reservationDate.month}.${reservationDate.year}',
-                style: kReservationDetails,
-              ), */
+
                     // RESERVATION TIME
                     DropdownButton(
                         value: reservationTime,
@@ -210,20 +216,21 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                             print(reservationTime);
                           });
                         }),
-                    /* Text(
-                'Reservation Time: $reservationTime',
-                style: kReservationDetails,
-              ), */
+
 // UPDATE BUTTON
                     RoundedButton(
+                        googleFonts: kGoogleFonts,
                         color: Colors.purple,
                         title: 'Change Reservation',
                         onPressed: () {
                           updateData();
+                          _controller1.clear();
+                          _controller2.clear();
                         }),
 
                     // DELETE BUTTON
                     RoundedButton(
+                        googleFonts: kGoogleFonts,
                         color: Colors.red,
                         title: 'Delete Reservation',
                         onPressed: () {
