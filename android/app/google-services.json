@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "57805998364",
+    "project_id": "astrid-81209",
+    "storage_bucket": "astrid-81209.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57805998364:android:6a0e9392658e79214e12d9",
+        "android_client_info": {
+          "package_name": "com.kiki.reservation_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "57805998364-r6vrah4n74eqo8tiq57bp4c3tm7ncl75.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMI1nXTgDZQO0D01dsqXT_uc1Ouo7DWNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "57805998364-r6vrah4n74eqo8tiq57bp4c3tm7ncl75.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
