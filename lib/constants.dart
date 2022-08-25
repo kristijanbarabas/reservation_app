@@ -59,3 +59,7 @@ final colorizeColors = [
   color4,
   color5,
 ];
+
+// RESERVATION TEXT
+
+const kReservationText = TextStyle(fontSize: 26.0);

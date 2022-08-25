@@ -2,9 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/screens/login_screen.dart';
 import 'package:reservation_app/screens/registration_screen.dart';
-import 'package:reservation_app/screens/reservation_details_screen.dart';
+import 'package:reservation_app/screens/change_reservation.dart';
 import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
+import 'package:reservation_app/screens/main_menu_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,8 @@ class ReservationApp extends StatelessWidget {
         RegistrationScreen.id: (context) => const RegistrationScreen(),
         LoginScreen.id: (context) => const LoginScreen(),
         ReservationScreen.id: (context) => const ReservationScreen(),
-        ReservationDetails.id: (context) => const ReservationDetails(),
+        ChangeReservation.id: (context) => const ChangeReservation(),
+        MainMenu.id: (context) => const MainMenu(),
       },
     );
   }

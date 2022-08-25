@@ -73,7 +73,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
-              googleFonts: GoogleFonts.dynalight(),
+              googleFonts: kGoogleFonts,
               color: Colors.red,
               title: kRegisterTitle,
               onPressed: () async {

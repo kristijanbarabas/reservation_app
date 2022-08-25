@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/login_screen.dart';
+import 'package:reservation_app/screens/main_menu_screen.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
 late User loggedInUser;
 
-class ReservationDetails extends StatefulWidget {
+class ChangeReservation extends StatefulWidget {
   static const String id = 'reservation_details';
 
-  const ReservationDetails({Key? key}) : super(key: key);
+  const ChangeReservation({Key? key}) : super(key: key);
 
   @override
-  State<ReservationDetails> createState() => _ReservationDetailsState();
+  State<ChangeReservation> createState() => _ChangeReservationState();
 }
 
-class _ReservationDetailsState extends State<ReservationDetails> {
+class _ChangeReservationState extends State<ChangeReservation> {
   // bool
   bool isLoading = true;
   // FORM DATA
@@ -45,7 +46,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         print(loggedInUser.email);
       }
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
 
@@ -119,20 +120,21 @@ class _ReservationDetailsState extends State<ReservationDetails> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, LoginScreen.id);
-            },
-            child: Icon(Icons.arrow_back)),
+          onTap: () {
+            Navigator.pushNamed(context, LoginScreen.id);
+          },
+          child: Icon(Icons.arrow_back),
+        ),
         actions: [
           GestureDetector(
             onTap: () {
               _auth.signOut();
-              Navigator.pushNamed(context, LoginScreen.id);
+              Navigator.pushNamed(context, MainMenu.id);
             },
             child: const Icon(Icons.clear),
           ),
         ],
-        title: const Text('Reservation Details'),
+        title: const Text('Change Reservation'),
       ),
       backgroundColor: Colors.white,
       body: isLoading
@@ -149,14 +151,16 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TextFieldWidget(
-                      text: 'Name: $name',
+                      hintText: 'Enter your name...',
+                      labelText: 'Name:',
                       controller: _controller1,
                       newValue: (value) {
                         name = value!;
                       },
                     ),
                     TextFieldWidget(
-                      text: 'Last name: $lastName',
+                      hintText: 'Enter your last name...',
+                      labelText: 'Last name: ',
                       controller: _controller2,
                       newValue: (value) {
                         lastName = value!;
@@ -219,25 +223,25 @@ class _ReservationDetailsState extends State<ReservationDetails> {
 
 // UPDATE BUTTON
                     RoundedButton(
-                        googleFonts: kGoogleFonts,
-                        color: Colors.purple,
-                        title: 'Change Reservation',
-                        onPressed: () {
-                          updateData();
-                          _controller1.clear();
-                          _controller2.clear();
-                        }),
+                      googleFonts: kGoogleFonts,
+                      color: Colors.purple,
+                      title: 'Change Reservation',
+                      onPressed: () {
+                        updateData();
+                        Navigator.pushNamed(context, MainMenu.id);
+                      },
+                    ),
 
                     // DELETE BUTTON
                     RoundedButton(
-                        googleFonts: kGoogleFonts,
-                        color: Colors.red,
-                        title: 'Delete Reservation',
-                        onPressed: () {
-                          _controller1.clear();
-                          _controller2.clear();
-                          //deleteData();
-                        })
+                      googleFonts: kGoogleFonts,
+                      color: Colors.red,
+                      title: 'Delete Reservation',
+                      onPressed: () {
+                        //deleteData();
+                        Navigator.pushNamed(context, MainMenu.id);
+                      },
+                    ),
                   ],
                 ),
               ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
-import 'package:reservation_app/screens/reservation_details_screen.dart';
+import 'package:reservation_app/screens/change_reservation.dart';
+import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,6 +38,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
   // DATE
   DateTime date = DateTime.now();
 
+  // controlleri
+  final _controller1 = TextEditingController();
+  final _controller2 = TextEditingController();
+
   // method to check if the user is signed in
   void getCurrentUser() {
     try {
@@ -44,7 +51,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
         print(registeredUser.email);
       }
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
 
@@ -86,22 +93,25 @@ class _ReservationScreenState extends State<ReservationScreen> {
             const SizedBox(
               height: 18.0,
             ),
-            TextField(
-              decoration:
-                  kTextFieldDecoration.copyWith(hintText: 'Enter your name...'),
-              onChanged: (value) {
-                name = value;
+
+            TextFieldWidget(
+              controller: _controller1,
+              newValue: (value) {
+                name = value!;
               },
+              labelText: 'Name:',
+              hintText: 'Enter your name...',
             ),
             const SizedBox(
               height: 18.0,
             ),
-            TextField(
-              decoration: kTextFieldDecoration.copyWith(
-                  hintText: 'Enter your last name...'),
-              onChanged: (value) {
-                lastName = value;
+            TextFieldWidget(
+              controller: _controller2,
+              newValue: (value) {
+                lastName = value!;
               },
+              labelText: 'Last Name:',
+              hintText: 'Enter your last name...',
             ),
             const SizedBox(
               height: 18.0,
@@ -175,19 +185,20 @@ class _ReservationScreenState extends State<ReservationScreen> {
             const SizedBox(),
             // SUBMIT BUTTON
             RoundedButton(
-                googleFonts: kGoogleFonts,
-                color: Colors.purple,
-                title: kSubmit,
-                onPressed: () {
-                  _firestore.collection('reservation').add({
-                    'name': name,
-                    'lastname': lastName,
-                    'timestamp': timestamp,
-                    'time': reservationTime,
-                    'sender': registeredUser.email,
-                  });
-                  Navigator.pushNamed(context, ReservationDetails.id);
-                }),
+              googleFonts: kGoogleFonts,
+              color: Colors.purple,
+              title: kSubmit,
+              onPressed: () {
+                _firestore.collection('reservation').add({
+                  'name': name,
+                  'lastname': lastName,
+                  'timestamp': timestamp,
+                  'time': reservationTime,
+                  'sender': registeredUser.email,
+                });
+                Navigator.pushNamed(context, MainMenu.id);
+              },
+            ),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:reservation_app/screens/reservation_details_screen.dart';
+
+import 'package:reservation_app/screens/main_menu_screen.dart';
+
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
@@ -81,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       email: email, password: password);
                   if (existingUser != null) {
                     // if the user is already registered he is sent to the reservation details screen
-                    Navigator.pushNamed(context, ReservationDetails.id);
+                    Navigator.pushNamed(context, MainMenu.id);
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
