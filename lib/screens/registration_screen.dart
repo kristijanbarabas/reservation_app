@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
@@ -33,19 +32,35 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             },
             child: const Icon(Icons.arrow_back)),
         automaticallyImplyLeading: false,
-        title: Text(kRegisterTitle),
+        title: Text(
+          kRegisterTitle,
+          style: kGoogleFonts,
+        ),
         centerTitle: true,
-        backgroundColor: Colors.purple,
+        backgroundColor: kButtonColor,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: kBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Flexible(
+              child: Hero(
+                tag: 'logo',
+                child: Container(
+                  height: 100,
+                  child: Image.asset('images/logo.png'),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 78.0,
+            ),
             // EMAIL INPUT
             TextField(
+              style: kTextFieldInputStyle,
               keyboardType: TextInputType.emailAddress,
               textAlign: TextAlign.center,
               onChanged: (value) {
@@ -60,6 +75,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             // PASSWORD INPUT
             TextField(
+                style: kTextFieldInputStyle,
                 obscureText: true,
                 textAlign: TextAlign.center,
                 onChanged: (value) {
@@ -73,8 +89,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
+              iconData: Icons.app_registration_rounded,
               googleFonts: kGoogleFonts,
-              color: Colors.red,
+              color: kButtonColor,
               title: kRegisterTitle,
               onPressed: () async {
                 try {

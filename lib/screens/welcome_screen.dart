@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/login_screen.dart';
@@ -21,37 +20,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      ColorizeAnimatedText(
-                        welcomeScreenTitle,
-                        textStyle: kWelcomeScreenTitle,
-                        colors: colorizeColors,
-                        speed: const Duration(milliseconds: 300),
-                        textDirection: TextDirection.rtl,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            Hero(
+                tag: 'logo',
+                child: Container(child: Image.asset('images/logo.png'))),
             const SizedBox(
-              height: 48.0,
+              height: 68.0,
             ),
+
             // LOGIN BUTTON
             RoundedButton(
-                color: color1,
+                iconData: Icons.login,
+                color: kButtonColor,
                 title: kLoginTitle,
                 googleFonts: kGoogleFonts,
                 onPressed: () {
@@ -59,7 +45,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 }),
             // REGISTER BUTTON
             RoundedButton(
-                color: color2,
+                iconData: Icons.app_registration_rounded,
+                color: kButtonColor,
                 title: kRegisterTitle,
                 googleFonts: kGoogleFonts,
                 onPressed: () {

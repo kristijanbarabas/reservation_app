@@ -33,24 +33,39 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             child: const Icon(Icons.arrow_back)),
         automaticallyImplyLeading: false,
-        title: const Text(kLoginTitle),
+        title: Text(
+          kLoginTitle,
+          style: kGoogleFonts,
+        ),
         centerTitle: true,
-        backgroundColor: Colors.purple,
+        backgroundColor: kBackgroundColor,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: kBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Flexible(
+              child: Hero(
+                tag: 'logo',
+                child: Container(
+                  height: 100,
+                  child: Image.asset('images/logo.png'),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 78.0,
+            ),
             // EMAIL INPUT
             TextField(
+              style: kTextFieldInputStyle,
               keyboardType: TextInputType.emailAddress,
               textAlign: TextAlign.center,
               onChanged: (value) {
                 email = value;
-                //Do something with the user input.
               },
               decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your email...'),
@@ -60,11 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             // PASSWORD INPUT
             TextField(
+                style: kTextFieldInputStyle,
                 obscureText: true,
                 textAlign: TextAlign.center,
                 onChanged: (value) {
                   password = value;
-                  //Do something with the user input.
                 },
                 decoration: kTextFieldDecoration.copyWith(
                     hintText: 'Enter your password...')),
@@ -73,15 +88,15 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             // LOGIN BUTTON
             RoundedButton(
+              iconData: Icons.login,
               googleFonts: kGoogleFonts,
-              color: Colors.red,
+              color: kButtonColor,
               title: kLoginTitle,
               onPressed: () async {
                 try {
                   final existingUser = await _auth.signInWithEmailAndPassword(
                       email: email, password: password);
                   if (existingUser != null) {
-                    // if the user is already registered he is sent to the reservation details screen
                     Navigator.pushNamed(context, MainMenu.id);
                   }
                 } catch (e) {

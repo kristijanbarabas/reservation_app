@@ -24,7 +24,7 @@ class TextFieldWidget extends StatelessWidget {
         controller: controller,
         decoration: kTextFieldDecoration.copyWith(
             labelText: labelText, hintText: hintText),
-        style: kReservationDetails,
+        style: kGoogleFonts,
         onChanged: newValue,
       ),
     );

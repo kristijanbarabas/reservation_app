@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
-import 'package:reservation_app/screens/change_reservation.dart';
+
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -65,8 +65,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kBackgroundColor,
       appBar: AppBar(
+        backgroundColor: kButtonColor,
         title: const Text('Reservation'),
         actions: [
           GestureDetector(
@@ -83,17 +84,16 @@ class _ReservationScreenState extends State<ReservationScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Align(
+            Align(
               alignment: Alignment.center,
               child: Text(
                 'Make your reservation!',
-                style: TextStyle(fontSize: 20.0),
+                style: kGoogleFonts.copyWith(fontSize: 30.0),
               ),
             ),
             const SizedBox(
               height: 18.0,
             ),
-
             TextFieldWidget(
               controller: _controller1,
               newValue: (value) {
@@ -117,7 +117,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
               height: 18.0,
             ),
             // IMPLEMENT DATE PICKER
-            Align(
+            Container(
               alignment: Alignment.center,
               child: GestureDetector(
                 onTap: () async {
@@ -126,8 +126,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                     initialDate: date,
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2023),
-                    /* selectableDayPredicate: (DateTime day) =>
-                        day.weekday == 6 || day.weekday == 7 ? false : true, */
+                    selectableDayPredicate: (DateTime day) =>
+                        day.weekday == 6 || day.weekday == 7 ? false : true,
                   );
                   setState(() {
                     date = newDate!;
@@ -135,13 +135,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 },
                 child: Text(
                   'Date: ${date.day}/${date.month}/${date.year}',
-                  style: const TextStyle(fontSize: 20.0),
+                  style: kGoogleFonts,
                 ),
               ),
             ),
-            Divider(
-              color: Colors.purple,
-            ),
+
             const SizedBox(
               height: 8.0,
             ),
@@ -151,25 +149,24 @@ class _ReservationScreenState extends State<ReservationScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 DropdownButton(
+                    dropdownColor: kBackgroundColor,
                     value: reservationTime,
                     icon: const Icon(
                       Icons.arrow_downward,
-                      color: Colors.purple,
+                      color: kButtonColor,
                     ),
-                    elevation: 16,
-                    style: const TextStyle(color: Colors.purple),
-                    underline: Container(
-                      color: Colors.transparent,
-                    ),
+                    elevation: 20,
+                    style: kGoogleFonts,
                     items: dropdownButtonList
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Container(
+                            color: kBackgroundColor,
                             child: Text(
-                          value,
-                          style: const TextStyle(fontSize: 20.0),
-                        )),
+                              value,
+                              style: const TextStyle(fontSize: 20.0),
+                            )),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
@@ -179,14 +176,12 @@ class _ReservationScreenState extends State<ReservationScreen> {
                     }),
               ],
             ),
-            const Divider(
-              color: Colors.purple,
-            ),
-            const SizedBox(),
+
             // SUBMIT BUTTON
             RoundedButton(
+              iconData: Icons.check,
               googleFonts: kGoogleFonts,
-              color: Colors.purple,
+              color: kButtonColor,
               title: kSubmit,
               onPressed: () {
                 _firestore.collection('reservation').add({

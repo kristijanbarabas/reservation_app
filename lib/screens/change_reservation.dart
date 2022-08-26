@@ -5,8 +5,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
-import 'package:reservation_app/screens/login_screen.dart';
+
 import 'package:reservation_app/screens/main_menu_screen.dart';
+import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
@@ -71,15 +72,6 @@ class _ChangeReservationState extends State<ChangeReservation> {
     );
   }
 
-  deleteData() async {
-    final docRef = _firestore
-        .collection('reservation')
-        .where('sender', isEqualTo: loggedInUser.email)
-        .get();
-    await docRef
-        .then((querySnapshot) => {querySnapshot.docs[0].reference.delete()});
-  }
-
   updateData() async {
     final docRef = _firestore
         .collection('reservation')
@@ -118,18 +110,11 @@ class _ChangeReservationState extends State<ChangeReservation> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, LoginScreen.id);
-          },
-          child: Icon(Icons.arrow_back),
-        ),
         actions: [
           GestureDetector(
             onTap: () {
               _auth.signOut();
-              Navigator.pushNamed(context, MainMenu.id);
+              Navigator.pushNamed(context, WelcomeScreen.id);
             },
             child: const Icon(Icons.clear),
           ),
@@ -150,22 +135,6 @@ class _ChangeReservationState extends State<ChangeReservation> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    TextFieldWidget(
-                      hintText: 'Enter your name...',
-                      labelText: 'Name:',
-                      controller: _controller1,
-                      newValue: (value) {
-                        name = value!;
-                      },
-                    ),
-                    TextFieldWidget(
-                      hintText: 'Enter your last name...',
-                      labelText: 'Last name: ',
-                      controller: _controller2,
-                      newValue: (value) {
-                        lastName = value!;
-                      },
-                    ),
                     Align(
                       alignment: Alignment.center,
                       child: GestureDetector(
@@ -223,22 +192,12 @@ class _ChangeReservationState extends State<ChangeReservation> {
 
 // UPDATE BUTTON
                     RoundedButton(
+                      iconData: Icons.done,
                       googleFonts: kGoogleFonts,
                       color: Colors.purple,
                       title: 'Change Reservation',
                       onPressed: () {
                         updateData();
-                        Navigator.pushNamed(context, MainMenu.id);
-                      },
-                    ),
-
-                    // DELETE BUTTON
-                    RoundedButton(
-                      googleFonts: kGoogleFonts,
-                      color: Colors.red,
-                      title: 'Delete Reservation',
-                      onPressed: () {
-                        //deleteData();
                         Navigator.pushNamed(context, MainMenu.id);
                       },
                     ),

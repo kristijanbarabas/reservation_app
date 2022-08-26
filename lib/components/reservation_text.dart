@@ -12,7 +12,7 @@ class ReservationText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '$label: $value',
-      style: kReservationText,
+      style: kGoogleFonts,
     );
   }
 }
