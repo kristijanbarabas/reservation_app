@@ -15,7 +15,7 @@ final TextStyle kGoogleFonts = GoogleFonts.rancho(
 );
 final TextStyle kMainMenuFonts = GoogleFonts.rancho(
   textStyle: const TextStyle(
-      fontSize: 15.0, color: Colors.white, fontWeight: FontWeight.w700),
+      fontSize: 20.0, color: Colors.white, fontWeight: FontWeight.w700),
 );
 
 final TextStyle kTextFieldInputStyle = GoogleFonts.rancho(
@@ -32,18 +32,22 @@ const String kSubmit = 'Submit';
 
 // TEXT FIELD DECORATION
 
-const kTextFieldDecoration = InputDecoration(
-  hintStyle: TextStyle(color: Colors.white),
-  labelStyle: TextStyle(color: Colors.white),
-  contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-  border: OutlineInputBorder(
+var kTextFieldDecoration = InputDecoration(
+  hintStyle: TextStyle(
+    color: Colors.white.withOpacity(0.5),
+  ),
+  labelStyle: TextStyle(
+    color: Colors.white.withOpacity(0.5),
+  ),
+  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+  border: const OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
-  enabledBorder: OutlineInputBorder(
+  enabledBorder: const OutlineInputBorder(
     borderSide: BorderSide(color: kButtonColor, width: 1.0),
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
-  focusedBorder: OutlineInputBorder(
+  focusedBorder: const OutlineInputBorder(
     borderSide: BorderSide(color: kButtonColor, width: 2.0),
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),

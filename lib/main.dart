@@ -5,12 +5,12 @@ import 'package:reservation_app/screens/registration_screen.dart';
 import 'package:reservation_app/screens/change_reservation.dart';
 import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
-import 'package:reservation_app/screens/main_menu_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const ReservationApp());
+  initializeDateFormatting().then((_) => runApp(const ReservationApp()));
 }
 
 class ReservationApp extends StatelessWidget {
@@ -27,7 +27,7 @@ class ReservationApp extends StatelessWidget {
         LoginScreen.id: (context) => const LoginScreen(),
         ReservationScreen.id: (context) => const ReservationScreen(),
         ChangeReservation.id: (context) => const ChangeReservation(),
-        MainMenu.id: (context) => const MainMenu(),
+        // MainMenu.id: (context) => const MainMenu(),
       },
     );
   }

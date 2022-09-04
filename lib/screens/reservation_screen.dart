@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
 
 import 'package:reservation_app/screens/main_menu_screen.dart';
+import 'package:reservation_app/screens/registration_screen.dart';
+
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
@@ -16,7 +17,9 @@ final _firestore = FirebaseFirestore.instance;
 class ReservationScreen extends StatefulWidget {
   static const String id = 'reservation_screen';
 
-  const ReservationScreen({Key? key}) : super(key: key);
+  const ReservationScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<ReservationScreen> createState() => _ReservationScreenState();
@@ -29,14 +32,17 @@ class _ReservationScreenState extends State<ReservationScreen> {
   late User registeredUser;
 
   // FORM variables
-  late String name;
-  late String lastName;
   late Timestamp timestamp = Timestamp.fromDate(date);
+
   // drop down button value for time
   late String reservationTime = dropdownButtonList[0];
 
   // DATE
   DateTime date = DateTime.now();
+
+  // map
+
+  late Map<String, dynamic> fireData;
 
   // controlleri
   final _controller1 = TextEditingController();
@@ -55,11 +61,36 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
   }
 
+  /* getDocument() async {
+    final docRef = _firestore.collection('user').doc().get();
+    await docRef.then(
+      (DocumentSnapshot snapshot) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          fireData = data;
+          print(fireData);
+        });
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+  } */
+
+  addData() {
+    _firestore
+        .collection('user')
+        .doc(registeredUser.uid)
+        .collection('reservation')
+        .add({
+      'timestamp': timestamp,
+      'time': reservationTime,
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    // initialize the method in the inital state of the app
     getCurrentUser();
+    print(registeredUser.uid);
   }
 
   @override
@@ -94,7 +125,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
             const SizedBox(
               height: 18.0,
             ),
-            TextFieldWidget(
+            /*  TextFieldWidget(
               controller: _controller1,
               newValue: (value) {
                 name = value!;
@@ -115,7 +146,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
             ),
             const SizedBox(
               height: 18.0,
-            ),
+            ), */
+
             // IMPLEMENT DATE PICKER
             Container(
               alignment: Alignment.center,
@@ -123,9 +155,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 onTap: () async {
                   DateTime? newDate = await showDatePicker(
                     context: context,
-                    initialDate: date,
+                    initialDate: date.weekday == 6 || date.weekday == 7
+                        ? date.add(const Duration(days: 2))
+                        : date,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime(2023),
+                    lastDate: DateTime(2024),
                     selectableDayPredicate: (DateTime day) =>
                         day.weekday == 6 || day.weekday == 7 ? false : true,
                   );
@@ -184,14 +218,15 @@ class _ReservationScreenState extends State<ReservationScreen> {
               color: kButtonColor,
               title: kSubmit,
               onPressed: () {
-                _firestore.collection('reservation').add({
-                  'name': name,
-                  'lastname': lastName,
-                  'timestamp': timestamp,
-                  'time': reservationTime,
-                  'sender': registeredUser.email,
-                });
-                Navigator.pushNamed(context, MainMenu.id);
+                addData();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: ((context) => MainMenu(
+                          userID: registeredUser.uid,
+                        )),
+                  ),
+                );
               },
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
@@ -6,8 +7,14 @@ import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'welcome_screen.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+//firestore instance
+final _firestore = FirebaseFirestore.instance;
+
 class RegistrationScreen extends StatefulWidget {
   static const String id = 'registration_screen';
+
   const RegistrationScreen({Key? key}) : super(key: key);
 
   @override
@@ -18,9 +25,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   // email and password variables
   late String email;
   late String password;
+  late String username;
 
   // firebase authentication
   final _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,9 +98,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 decoration: kTextFieldDecoration.copyWith(
                     hintText: 'Enter your password...')),
             const SizedBox(
-              height: 24.0,
+              height: 8.0,
             ),
-            // LOGIN BUTTON
+            TextField(
+                style: kTextFieldInputStyle,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  username = value;
+                  //Do something with the user input.
+                },
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: 'Enter your username...')),
+
+            // REGISTER BUTTON
             RoundedButton(
               iconData: Icons.app_registration_rounded,
               googleFonts: kGoogleFonts,
@@ -99,7 +122,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       email: email, password: password);
                   if (newUser != null) {
                     // send the user to the reservation screen
-                    Navigator.pushNamed(context, ReservationScreen.id);
+                    _firestore
+                        .collection('user')
+                        .doc(newUser.user!.uid)
+                        .collection('profile')
+                        .add({
+                      'username': username,
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) => MainMenu(
+                              userID: newUser.user!.uid,
+                            )),
+                      ),
+                    );
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")

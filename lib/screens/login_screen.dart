@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // email and password variables
   late String email;
   late String password;
+  late String userID;
   // firebase auth
   final _auth = FirebaseAuth.instance;
 
@@ -97,7 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   final existingUser = await _auth.signInWithEmailAndPassword(
                       email: email, password: password);
                   if (existingUser != null) {
-                    Navigator.pushNamed(context, MainMenu.id);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MainMenu(userID: _auth.currentUser!.uid),
+                      ),
+                    );
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
