@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
-
 import 'package:reservation_app/screens/main_menu_screen.dart';
-
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+Future<UserCredential> signInWithGoogle() async {
+  // Trigger the authentication flow
+  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+  // Obtain the auth details from the request
+  final GoogleSignInAuthentication? googleAuth =
+      await googleUser?.authentication;
+
+  // Create a new credential
+  final credential = GoogleAuthProvider.credential(
+    accessToken: googleAuth?.accessToken,
+    idToken: googleAuth?.idToken,
+  );
+
+  // Once signed in, return the UserCredential
+  return await FirebaseAuth.instance.signInWithCredential(credential);
+}
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -57,8 +75,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
+
             const SizedBox(
-              height: 78.0,
+              height: 54.0,
             ),
             // EMAIL INPUT
             TextField(
@@ -87,6 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 24.0,
             ),
+
             // LOGIN BUTTON
             RoundedButton(
               iconData: Icons.login,
@@ -111,6 +131,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       .show();
                 }
               },
+            ),
+            const SizedBox(
+              height: 24.0,
+            ),
+            GestureDetector(
+              onTap: () {
+                signInWithGoogle();
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: 5,
+                        color: Color.fromARGB(255, 36, 36, 36),
+                        spreadRadius: 0.1)
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 35,
+                  child: FaIcon(
+                    FontAwesomeIcons.google,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: kButtonColor,
+                ),
+              ),
             ),
           ],
         ),

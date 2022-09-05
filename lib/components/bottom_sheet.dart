@@ -7,10 +7,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/constants.dart';
 
-Data data = Data();
-
 // creating our user
-late User registeredUser;
+late User loggedInUser;
 //firestore instance
 final _firestore = FirebaseFirestore.instance;
 // DATE
@@ -18,7 +16,7 @@ DateTime date = DateTime.now();
 CollectionReference reservationBookingStream = _firestore.collection('user');
 CollectionReference reservation = _firestore
     .collection('user')
-    .doc(registeredUser.uid)
+    .doc(loggedInUser.uid)
     .collection('reservation');
 CollectionReference reservationList =
     _firestore.collection('user').doc().collection('reservation');
@@ -33,8 +31,6 @@ class CustomBottomSheet extends StatefulWidget {
 }
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
-  // drop down button value for time
-
   // firebase auth
   final _auth = FirebaseAuth.instance;
 
@@ -49,8 +45,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        registeredUser = user;
-        print(registeredUser.email);
+        loggedInUser = user;
+        print(loggedInUser.email);
       }
       isLoading = false;
     } catch (e) {
@@ -59,18 +55,18 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   }
 
   // booking service
-  late BookingService mockBookingService;
+  late BookingService reservationService;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentUser();
-    mockBookingService = BookingService(
-        serviceName: 'Reservation Service',
-        serviceDuration: 120,
-        bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
-        bookingStart: DateTime(date.year, date.month, date.day, 8, 0));
+    reservationService = BookingService(
+      serviceName: 'Reservation Service',
+      serviceDuration: 120,
+      bookingStart: DateTime(date.year, date.month, date.day, 8, 0),
+      bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
+    );
     // getData();
   }
 
@@ -89,7 +85,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
   Stream<dynamic>? getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
-    return getBookingStream(placeId: registeredUser.uid)
+    return getBookingStream(placeId: loggedInUser.uid)
         .where('bookingStart', isGreaterThanOrEqualTo: start)
         .where('bookingStart', isLessThanOrEqualTo: end)
         .snapshots();
@@ -103,13 +99,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     Navigator.pop(context);
   }
 
-  late Map<String, dynamic> fireData = {};
-
   late List<DateTimeRange> converted = [];
 
   List<DateTimeRange> convertStreamResultMock({required dynamic streamResult}) {
     {
-      final docRef = reservationList.get();
+      final docRef = reservation.get();
       docRef.then((QuerySnapshot snapshot) {
         final data = snapshot.docs.forEach((DocumentSnapshot doc) {
           Map<String, dynamic> fireData = doc.data() as Map<String, dynamic>;
@@ -122,12 +116,48 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               DateTime.parse(reservationDate);
           final reservationWidget = DateTimeRange(
               start: parsedReservationTime, end: parsedReservationDate);
+          /* DateTime saturday = DateTime.saturday as DateTime;
+          DateTime sunday = DateTime.saturday as DateTime;
+          returnconverted.add(DateTimeRange(start: saturday, end: sunday)); */
           return converted.add(reservationWidget);
         });
       });
     }
     print('this is : $converted');
     return converted;
+  }
+
+  List<DateTimeRange> generatePauseSlots() {
+    return [
+      //SEPTEMBER
+      DateTimeRange(
+          start: DateTime(2022, 9, 3, 8, 0), end: DateTime(2022, 9, 4, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 9, 10, 8, 0),
+          end: DateTime(2022, 9, 11, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 9, 17, 8, 0),
+          end: DateTime(2022, 9, 18, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 9, 24, 8, 0),
+          end: DateTime(2022, 9, 25, 16, 0)),
+      //OCTOBER
+      DateTimeRange(
+          start: DateTime(2022, 10, 1, 8, 0),
+          end: DateTime(2022, 10, 2, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 10, 8, 8, 0),
+          end: DateTime(2022, 10, 9, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 10, 15, 8, 0),
+          end: DateTime(2022, 10, 16, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 10, 22, 8, 0),
+          end: DateTime(2022, 10, 23, 16, 0)),
+      DateTimeRange(
+          start: DateTime(2022, 10, 29, 8, 0),
+          end: DateTime(2022, 10, 30, 16, 0)),
+    ];
   }
 
   @override
@@ -147,15 +177,18 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                 duration: Duration(seconds: 3),
               )
             : BookingCalendar(
-                bookingService: mockBookingService,
+                bookingService: reservationService,
                 getBookingStream: getBookingStreamFirebase,
                 uploadBooking: uploadBooking,
                 convertStreamResultToDateTimeRanges: convertStreamResultMock,
                 bookingButtonText: 'SUBMIT',
                 bookingButtonColor: kButtonColor,
-                loadingWidget: const Text('Fetching data...'),
-                uploadingWidget: const Text('Uploading...'),
+                loadingWidget: const LinearProgressIndicator(),
+                uploadingWidget: const LinearProgressIndicator(),
                 startingDayOfWeek: StartingDayOfWeek.monday,
+                pauseSlots: generatePauseSlots(),
+                hideBreakTime: false,
+                bookingGridCrossAxisCount: 2,
               ));
   }
 }

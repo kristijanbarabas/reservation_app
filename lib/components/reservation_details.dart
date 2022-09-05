@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reservation_app/constants.dart';
 
 class ReservationDetails extends StatelessWidget {
-  final dynamic reservationTime;
-  final dynamic reservationDate;
+  final String reservationTime;
+  final String reservationDate;
 
   const ReservationDetails(
       {Key? key, this.reservationTime = '', this.reservationDate = ''})

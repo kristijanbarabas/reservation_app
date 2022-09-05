@@ -8,6 +8,9 @@ import 'package:reservation_app/constants.dart';
 
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:reservation_app/components/bottom_sheet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final _auth = FirebaseAuth.instance;
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -127,152 +130,163 @@ class _MainMenuState extends State<MainMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: kButtonColor,
-        title: Text(
-          'Welcome $username !',
-          style: kGoogleFonts,
-        ),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              _auth.signOut();
-              Navigator.pushNamed(context, WelcomeScreen.id);
-            },
-            child: const Icon(Icons.clear),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: Container(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  'Your Reservations:',
-                  style: kGoogleFonts.copyWith(fontSize: 40.0),
-                ),
+    return isLoading
+        ? const SpinKitChasingDots(
+            color: Colors.black,
+            duration: Duration(seconds: 3),
+          )
+        : Scaffold(
+            backgroundColor: kBackgroundColor,
+            appBar: AppBar(
+              backgroundColor: kButtonColor,
+              title: Text(
+                'Welcome $username !',
+                style: kGoogleFonts,
               ),
-            ),
-            const SizedBox(
-              height: 10.0,
-            ),
-            Expanded(
-              flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: isLoading
-                    ? const SpinKitChasingDots(
-                        color: Colors.black,
-                        duration: Duration(seconds: 3),
-                      )
-                    : StreamBuilder<QuerySnapshot>(
-                        stream: _firestore
-                            .collection('user')
-                            .doc(loggedInUser.uid)
-                            .collection('reservation')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: SpinKitChasingDots(
-                                color: Colors.black,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          } else {
-                            final reservation = snapshot.data!.docs;
-
-                            // list of widgets
-                            List<ReservationDetails> reservationList = [];
-                            //
-                            for (var snapshot in reservation) {
-                              Map<String, dynamic> fireData =
-                                  snapshot.data() as Map<String, dynamic>;
-                              final String reservationTime =
-                                  fireData['bookingStart'];
-                              final DateTime parsedReservationTime =
-                                  DateTime.parse(reservationTime);
-                              final reservationDate = fireData['bookingEnd'];
-                              final DateTime parsedReservationDate =
-                                  DateTime.parse(reservationDate);
-
-                              final reservationWidget = ReservationDetails(
-                                reservationTime:
-                                    '${parsedReservationTime.hour}-${parsedReservationDate.hour}',
-                                reservationDate:
-                                    '${parsedReservationDate.day}.${parsedReservationDate.month}.${parsedReservationDate.year}',
-                              );
-
-                              reservationList.add(reservationWidget);
-                            }
-                            return Row(
-                              children: [
-                                Expanded(
-                                    child: ListView.builder(
-                                  itemCount: reservationList.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      onTap: () => print(
-                                          index), //here you have access to it
-                                      child: GestureDetector(
-                                          onTap: () {
-                                            deleteData(index);
-                                          },
-                                          child: reservationList[index]),
-                                    );
-                                  },
-                                )),
-                              ],
-                            );
-                          }
-                        }),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: RoundedButton(
-                      iconData: Icons.add,
-                      color: kButtonColor,
-                      title: 'Add',
-                      onPressed: () {
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (context) => const CustomBottomSheet());
-                      },
-                      googleFonts: kMainMenuFonts),
-                ),
-                SizedBox(
-                  width: 14.0,
-                ),
-                Expanded(
-                  child: RoundedButton(
-                    iconData: Icons.edit,
-                    googleFonts: kMainMenuFonts,
-                    color: kButtonColor,
-                    title: 'Edit',
-                    onPressed: () {
-                      //updateData();
-                    },
-                  ),
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    _auth.signOut();
+                    Navigator.pushNamed(context, WelcomeScreen.id);
+                  },
+                  child: const Icon(Icons.clear),
                 ),
               ],
-            )
-          ],
-        ),
-      ),
-    );
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        'Your Reservations:',
+                        style: kGoogleFonts.copyWith(fontSize: 40.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10.0)),
+                      child: isLoading
+                          ? const SpinKitChasingDots(
+                              color: Colors.black,
+                              duration: Duration(seconds: 3),
+                            )
+                          : StreamBuilder<QuerySnapshot>(
+                              stream: _firestore
+                                  .collection('user')
+                                  .doc(loggedInUser.uid)
+                                  .collection('reservation')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: SpinKitChasingDots(
+                                      color: Colors.black,
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                } else {
+                                  final reservation = snapshot.data!.docs;
+
+                                  // list of widgets
+                                  List<ReservationDetails> reservationList = [];
+                                  //
+                                  for (var snapshot in reservation) {
+                                    Map<String, dynamic> fireData =
+                                        snapshot.data() as Map<String, dynamic>;
+                                    final String reservationTime =
+                                        fireData['bookingStart'];
+                                    final DateTime parsedReservationTime =
+                                        DateTime.parse(reservationTime);
+                                    final reservationDate =
+                                        fireData['bookingEnd'];
+                                    final DateTime parsedReservationDate =
+                                        DateTime.parse(reservationDate);
+                                    final sortReservationDate =
+                                        parsedReservationDate.day.toString();
+
+                                    final reservationWidget =
+                                        ReservationDetails(
+                                      reservationTime:
+                                          '${parsedReservationTime.hour}-${parsedReservationDate.hour}',
+                                      reservationDate:
+                                          '${parsedReservationDate.day}.${parsedReservationDate.month}.${parsedReservationDate.year}',
+                                    );
+
+                                    reservationList.add(reservationWidget);
+                                    reservationList.sort(((a, b) => a
+                                        .reservationTime
+                                        .compareTo(b.reservationTime)));
+                                  }
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                          child: ListView.builder(
+                                        itemCount: reservationList.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return GestureDetector(
+                                            onTap: () => print(
+                                                index), //here you have access to it
+                                            child: GestureDetector(
+                                                onTap: () {
+                                                  deleteData(index);
+                                                },
+                                                child: reservationList[index]),
+                                          );
+                                        },
+                                      )),
+                                    ],
+                                  );
+                                }
+                              }),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: RoundedButton(
+                            iconData: Icons.add,
+                            color: kButtonColor,
+                            title: 'Add',
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (context) =>
+                                      const CustomBottomSheet());
+                            },
+                            googleFonts: kMainMenuFonts),
+                      ),
+                      SizedBox(
+                        width: 14.0,
+                      ),
+                      Expanded(
+                        child: RoundedButton(
+                          iconData: Icons.edit,
+                          googleFonts: kMainMenuFonts,
+                          color: kButtonColor,
+                          title: 'Edit',
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
   }
 }
