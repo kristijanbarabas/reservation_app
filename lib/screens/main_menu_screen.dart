@@ -5,12 +5,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:reservation_app/components/reservation_details.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
-
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:reservation_app/components/bottom_sheet.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-final _auth = FirebaseAuth.instance;
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -219,7 +215,7 @@ class _MainMenuState extends State<MainMenu> {
                                     final reservationWidget =
                                         ReservationDetails(
                                       reservationTime:
-                                          '${parsedReservationTime.hour}-${parsedReservationDate.hour}',
+                                          '${parsedReservationTime.hour}:00 - ${parsedReservationDate.hour}:00',
                                       reservationDate:
                                           '${parsedReservationDate.day}.${parsedReservationDate.month}.${parsedReservationDate.year}',
                                     );
@@ -240,7 +236,7 @@ class _MainMenuState extends State<MainMenu> {
                                             onTap: () => print(
                                                 index), //here you have access to it
                                             child: GestureDetector(
-                                                onTap: () {
+                                                onDoubleTap: () {
                                                   deleteData(index);
                                                 },
                                                 child: reservationList[index]),

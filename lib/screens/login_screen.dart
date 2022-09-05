@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
@@ -8,23 +9,10 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-Future<UserCredential> signInWithGoogle() async {
-  // Trigger the authentication flow
-  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-  // Obtain the auth details from the request
-  final GoogleSignInAuthentication? googleAuth =
-      await googleUser?.authentication;
-
-  // Create a new credential
-  final credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth?.accessToken,
-    idToken: googleAuth?.idToken,
-  );
-
-  // Once signed in, return the UserCredential
-  return await FirebaseAuth.instance.signInWithCredential(credential);
-}
+late dynamic googleCredential;
+var instance = FirebaseAuth.instance.signInWithCredential(googleCredential);
+//firestore instance
+final _firestore = FirebaseFirestore.instance;
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -35,6 +23,28 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    setState(() {
+      googleCredential = credential;
+    });
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   // email and password variables
   late String email;
   late String password;
@@ -138,9 +148,29 @@ class _LoginScreenState extends State<LoginScreen> {
             GestureDetector(
               onTap: () {
                 signInWithGoogle();
+                if (_auth.currentUser!.uid != null) {
+                  // send the user to the reservation screen
+                  _firestore
+                      .collection('user')
+                      .doc('lRUIpJrRfxQqEjaCUSipanGkAnz2')
+                      .collection('profile')
+                      .add({
+                    'username': '',
+                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => MainMenu(
+                            userID: _auth.currentUser!.uid,
+                          )),
+                    ),
+                  );
+                }
+
+                print(_auth.currentUser!.uid);
               },
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -149,13 +179,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         spreadRadius: 0.1)
                   ],
                 ),
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 35,
+                  backgroundColor: kButtonColor,
                   child: FaIcon(
                     FontAwesomeIcons.google,
                     color: Colors.white,
                   ),
-                  backgroundColor: kButtonColor,
                 ),
               ),
             ),

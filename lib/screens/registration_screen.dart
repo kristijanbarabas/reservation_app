@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
-import 'package:reservation_app/screens/reservation_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
