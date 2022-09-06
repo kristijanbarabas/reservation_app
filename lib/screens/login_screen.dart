@@ -9,8 +9,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-late dynamic googleCredential;
-var instance = FirebaseAuth.instance.signInWithCredential(googleCredential);
 //firestore instance
 final _firestore = FirebaseFirestore.instance;
 
@@ -36,10 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
-
-    setState(() {
-      googleCredential = credential;
-    });
 
     // Once signed in, return the UserCredential
     return await FirebaseAuth.instance.signInWithCredential(credential);
@@ -152,10 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   // send the user to the reservation screen
                   _firestore
                       .collection('user')
-                      .doc('lRUIpJrRfxQqEjaCUSipanGkAnz2')
+                      .doc(_auth.currentUser!.uid)
                       .collection('profile')
                       .add({
-                    'username': '',
+                    'username': _auth.currentUser!.displayName,
                   });
                   Navigator.push(
                     context,

@@ -26,12 +26,6 @@ class _MainMenuState extends State<MainMenu> {
   // PROFILE DATA
   late Map<String, dynamic> fireProfile = {};
   late String username = fireProfile['username'];
-  // RESERVATION DATA
-  /*  late int index;
-  List fireList = [];
-  late Timestamp timestamp = fireList[index]['timestamp'];
-  late DateTime reservationDate = timestamp.toDate();
-  late String reservationTime = fireList[index]['time']; */
   // authentification
   final _auth = FirebaseAuth.instance;
 
@@ -46,30 +40,14 @@ class _MainMenuState extends State<MainMenu> {
     }
   }
 
-  /* getReservation() async {
-    isLoading = true;
-    final docRef = await _firestore
-        .collection('user')
-        .doc(loggedInUser.uid)
-        .collection('reservation')
-        .get();
-    /*  await docRef.then(
-      (QuerySnapshot snapshot) {
-        final data = snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          setState(() {
-            fireData = documentSnapshot.data() as Map<String, dynamic>;
-            isLoading = false;
-          });
-        });
-      },  */
-    for (var snapshot in docRef.docs) {
-      final data = snapshot.data();
-      print(data);
-      fireList.add(data);
+  signoutUser() {
+    try {
+      _auth.signOut();
+      print('Signout Succesfull');
+    } catch (e) {
+      print('Signout Failed');
     }
-    /*  onError: (e) => print("Error getting document: $e"),
-    ); */
-  } */
+  }
 
   getProfile() async {
     isLoading = true;
@@ -101,26 +79,10 @@ class _MainMenuState extends State<MainMenu> {
         (querySnapshot) => {querySnapshot.docs[index].reference.delete()});
   }
 
-/*   updateData() async {
-    final docRef = _firestore
-        .collection('reservation')
-        .where('sender', isEqualTo: loggedInUser.email)
-        .get();
-    await docRef.then((querySnapshot) => {
-          querySnapshot.docs[0].reference.set({
-            'name': username,
-            'timestamp': reservationDate,
-            'time': reservationTime,
-            'sender': loggedInUser.email
-          })
-        });
-  } */
-
   @override
   void initState() {
     super.initState();
     getCurrentUser();
-    //getReservation();
     getProfile();
   }
 
@@ -286,3 +248,43 @@ class _MainMenuState extends State<MainMenu> {
           );
   }
 }
+
+  /* getReservation() async {
+    isLoading = true;
+    final docRef = await _firestore
+        .collection('user')
+        .doc(loggedInUser.uid)
+        .collection('reservation')
+        .get();
+    /*  await docRef.then(
+      (QuerySnapshot snapshot) {
+        final data = snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+          setState(() {
+            fireData = documentSnapshot.data() as Map<String, dynamic>;
+            isLoading = false;
+          });
+        });
+      },  */
+    for (var snapshot in docRef.docs) {
+      final data = snapshot.data();
+      print(data);
+      fireList.add(data);
+    }
+    /*  onError: (e) => print("Error getting document: $e"),
+    ); */
+  } */
+
+  /*   updateData() async {
+    final docRef = _firestore
+        .collection('reservation')
+        .where('sender', isEqualTo: loggedInUser.email)
+        .get();
+    await docRef.then((querySnapshot) => {
+          querySnapshot.docs[0].reference.set({
+            'name': username,
+            'timestamp': reservationDate,
+            'time': reservationTime,
+            'sender': loggedInUser.email
+          })
+        });
+  } */
