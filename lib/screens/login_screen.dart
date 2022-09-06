@@ -139,26 +139,31 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 24.0,
             ),
+            // GOOGLE LOGIN BUTTON
             GestureDetector(
               onTap: () {
-                signInWithGoogle();
-                if (_auth.currentUser!.uid != null) {
-                  // send the user to the reservation screen
-                  _firestore
-                      .collection('user')
-                      .doc(_auth.currentUser!.uid)
-                      .collection('profile')
-                      .add({
-                    'username': _auth.currentUser!.displayName,
-                  });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: ((context) => MainMenu(
-                            userID: _auth.currentUser!.uid,
-                          )),
-                    ),
-                  );
+                try {
+                  signInWithGoogle();
+                  if (_auth.currentUser!.uid != null) {
+                    _firestore
+                        .collection('user')
+                        .doc(_auth.currentUser!.uid)
+                        .collection('profile')
+                        .add({
+                      'username': _auth.currentUser!.displayName,
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) => MainMenu(
+                              userID: _auth.currentUser!.uid,
+                            )),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  Alert(context: context, title: "Error", desc: "Try again!")
+                      .show();
                 }
 
                 print(_auth.currentUser!.uid);
