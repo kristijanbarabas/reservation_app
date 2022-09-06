@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/login_screen.dart';
@@ -15,8 +14,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  String welcomeScreenTitle = 'STUDIO ASTRID';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

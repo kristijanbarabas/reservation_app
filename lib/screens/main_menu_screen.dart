@@ -7,6 +7,7 @@ import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:reservation_app/components/bottom_sheet.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -96,6 +97,7 @@ class _MainMenuState extends State<MainMenu> {
         : Scaffold(
             backgroundColor: kBackgroundColor,
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               backgroundColor: kButtonColor,
               title: Text(
                 'Welcome $username !',
@@ -104,7 +106,7 @@ class _MainMenuState extends State<MainMenu> {
               actions: [
                 GestureDetector(
                   onTap: () {
-                    _auth.signOut();
+                    signoutUser();
                     Navigator.pushNamed(context, WelcomeScreen.id);
                   },
                   child: const Icon(Icons.clear),
@@ -198,8 +200,55 @@ class _MainMenuState extends State<MainMenu> {
                                             onTap: () => print(
                                                 index), //here you have access to it
                                             child: GestureDetector(
-                                                onDoubleTap: () {
-                                                  deleteData(index);
+                                                onLongPress: () {
+                                                  Alert(
+                                                    context: context,
+                                                    type: AlertType.warning,
+                                                    title:
+                                                        "DELETE RESERVATION!",
+                                                    desc: "Are you sure?",
+                                                    buttons: [
+                                                      DialogButton(
+                                                        child: Text(
+                                                          "YES",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 20),
+                                                        ),
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          deleteData(index);
+                                                        },
+                                                        color: Color.fromRGBO(
+                                                            0, 179, 134, 1.0),
+                                                      ),
+                                                      DialogButton(
+                                                        child: Text(
+                                                          "NO",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 20),
+                                                        ),
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                context),
+                                                        gradient:
+                                                            LinearGradient(
+                                                                colors: [
+                                                              Color.fromRGBO(
+                                                                  116,
+                                                                  116,
+                                                                  191,
+                                                                  1.0),
+                                                              Color.fromRGBO(52,
+                                                                  138, 199, 1.0)
+                                                            ]),
+                                                      )
+                                                    ],
+                                                  ).show();
                                                 },
                                                 child: reservationList[index]),
                                           );
