@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:reservation_app/screens/main_menu_screen.dart';
+import 'package:reservation_app/screens/home.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
@@ -122,13 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final existingUser = await _auth.signInWithEmailAndPassword(
                       email: email, password: password);
                   if (existingUser != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MainMenu(userID: _auth.currentUser!.uid),
-                      ),
-                    );
+                    Navigator.pushNamed(context, HomeScreen.id);
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
@@ -152,21 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         .add({
                       'username': _auth.currentUser!.displayName,
                     });
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: ((context) => MainMenu(
-                              userID: _auth.currentUser!.uid,
-                            )),
-                      ),
-                    );
+                    Navigator.pushNamed(context, HomeScreen.id);
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
                       .show();
                 }
-
-                print(_auth.currentUser!.uid);
               },
               child: Container(
                 decoration: const BoxDecoration(

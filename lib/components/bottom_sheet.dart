@@ -6,6 +6,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/constants.dart';
+import 'package:collection/collection.dart';
 
 // creating our user
 late User loggedInUser;
@@ -13,11 +14,12 @@ late User loggedInUser;
 final _firestore = FirebaseFirestore.instance;
 // DATE
 DateTime date = DateTime.now();
-CollectionReference reservationBookingStream = _firestore.collection('user');
-CollectionReference reservation = _firestore
-    .collection('user')
-    .doc(loggedInUser.uid)
+CollectionReference reservationBookingStream = _firestore
+    .collection('reservation')
+    .doc('reservation')
     .collection('reservation');
+CollectionReference reservation =
+    _firestore.collection('user').doc('reservation').collection('reservation');
 CollectionReference reservationList =
     _firestore.collection('user').doc().collection('reservation');
 
@@ -57,35 +59,19 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   // booking service
   late BookingService reservationService;
 
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
-    reservationService = BookingService(
-      serviceName: 'Reservation Service',
-      serviceDuration: 120,
-      bookingStart: DateTime(date.year, date.month, date.day, 8, 0),
-      bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
-    );
-    // getData();
-  }
-
   ///This is how can you get the reference to your data from the collection, and serialize the data with the help of the Firestore [withConverter]. This function would be in your repository.
   CollectionReference<Data> getBookingStream({required String placeId}) {
-    return reservationBookingStream
-        .doc(placeId)
-        .collection('reservation')
-        .withConverter<Data>(
-          fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
-          toFirestore: (snapshots, _) => snapshots.toJson(),
-        );
+    return reservationBookingStream.withConverter<Data>(
+      fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
+      toFirestore: (snapshots, _) => snapshots.toJson(),
+    );
   }
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
   Stream<dynamic>? getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
-    return getBookingStream(placeId: loggedInUser.uid)
+    return getBookingStream(placeId: 'reservation')
         .where('bookingStart', isGreaterThanOrEqualTo: start)
         .where('bookingStart', isLessThanOrEqualTo: end)
         .snapshots();
@@ -96,7 +82,23 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
         .add(newBooking.toJson())
         .then((value) => print('Booking added'))
         .catchError((error) => print('Failed to add booking: $error'));
-    Navigator.pop(context);
+    Future.delayed(const Duration(seconds: 1));
+    Alert(
+      context: context,
+      type: AlertType.success,
+      title: "SUCCESS!",
+      desc: "Your reservation has been added.",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+        )
+      ],
+    ).show();
   }
 
   late List<DateTimeRange> converted = [];
@@ -105,7 +107,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     {
       final docRef = reservation.get();
       docRef.then((QuerySnapshot snapshot) {
-        final data = snapshot.docs.forEach((DocumentSnapshot doc) {
+        snapshot.docs.forEach((DocumentSnapshot doc) {
           Map<String, dynamic> fireData = doc.data() as Map<String, dynamic>;
           print('this is : $fireData');
           final String reservationTime = fireData['bookingStart'];
@@ -116,48 +118,65 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               DateTime.parse(reservationDate);
           final reservationWidget = DateTimeRange(
               start: parsedReservationTime, end: parsedReservationDate);
-          /* DateTime saturday = DateTime.saturday as DateTime;
-          DateTime sunday = DateTime.saturday as DateTime;
-          returnconverted.add(DateTimeRange(start: saturday, end: sunday)); */
           return converted.add(reservationWidget);
         });
       });
     }
-    print('this is : $converted');
     return converted;
   }
 
+  final List itemsSaturday = List<DateTime>.generate(
+      730,
+      (i) => DateTime.utc(2022, DateTime.september, 1, 7, 0)
+          .add(Duration(days: i)));
+
+  final List itemsSunday = List<DateTime>.generate(
+      730,
+      (i) => DateTime.utc(2022, DateTime.september, 1, 16, 0)
+          .add(Duration(days: i)));
+
+  final List<DateTime> listSaturday = [];
+
+  final List<DateTime> listSunday = [];
+
+  functionSaturday(items) {
+    for (DateTime item in items) {
+      if (item.weekday == DateTime.saturday) {
+        listSaturday.add(item);
+      }
+    }
+  }
+
+  functionSunday(items) {
+    for (DateTime item in items) {
+      if (item.weekday == DateTime.sunday) {
+        listSunday.add(item);
+      }
+    }
+  }
+
   List<DateTimeRange> generatePauseSlots() {
-    return [
-      //SEPTEMBER
-      DateTimeRange(
-          start: DateTime(2022, 9, 3, 8, 0), end: DateTime(2022, 9, 4, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 9, 10, 8, 0),
-          end: DateTime(2022, 9, 11, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 9, 17, 8, 0),
-          end: DateTime(2022, 9, 18, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 9, 24, 8, 0),
-          end: DateTime(2022, 9, 25, 16, 0)),
-      //OCTOBER
-      DateTimeRange(
-          start: DateTime(2022, 10, 1, 8, 0),
-          end: DateTime(2022, 10, 2, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 10, 8, 8, 0),
-          end: DateTime(2022, 10, 9, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 10, 15, 8, 0),
-          end: DateTime(2022, 10, 16, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 10, 22, 8, 0),
-          end: DateTime(2022, 10, 23, 16, 0)),
-      DateTimeRange(
-          start: DateTime(2022, 10, 29, 8, 0),
-          end: DateTime(2022, 10, 30, 16, 0)),
-    ];
+    List<DateTimeRange> list = [];
+    for (final pairs in IterableZip([listSaturday, listSunday])) {
+      list.add(DateTimeRange(start: pairs[0], end: pairs[1]));
+    }
+    return list;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    reservationService = BookingService(
+      serviceName: 'Reservation Service',
+      serviceDuration: 120,
+      bookingStart: DateTime(date.year, date.month, date.day, 8, 0),
+      bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
+      userId: loggedInUser.uid,
+    );
+
+    functionSaturday(itemsSaturday);
+    functionSunday(itemsSunday);
   }
 
   @override

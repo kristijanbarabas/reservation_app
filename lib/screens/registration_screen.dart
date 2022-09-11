@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reservation_app/screens/home.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../components/rounded_button.dart';
@@ -128,14 +129,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         .add({
                       'username': username,
                     });
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: ((context) => MainMenu(
-                              userID: newUser.user!.uid,
-                            )),
-                      ),
-                    );
+                    Navigator.pushNamed(context, HomeScreen.id);
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
