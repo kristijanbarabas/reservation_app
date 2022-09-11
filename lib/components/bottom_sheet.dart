@@ -61,7 +61,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   ///This is how can you get the reference to your data from the collection, and serialize the data with the help of the Firestore [withConverter]. This function would be in your repository.
   CollectionReference<Data> getBookingStream({required String placeId}) {
-    return reservationBookingStream.withConverter<Data>(
+    return reservation.withConverter<Data>(
       fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
       toFirestore: (snapshots, _) => snapshots.toJson(),
     );
@@ -139,7 +139,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   final List<DateTime> listSunday = [];
 
-  functionSaturday(items) {
+  addSaturday(items) {
     for (DateTime item in items) {
       if (item.weekday == DateTime.saturday) {
         listSaturday.add(item);
@@ -147,7 +147,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     }
   }
 
-  functionSunday(items) {
+  addSunday(items) {
     for (DateTime item in items) {
       if (item.weekday == DateTime.sunday) {
         listSunday.add(item);
@@ -156,11 +156,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   }
 
   List<DateTimeRange> generatePauseSlots() {
-    List<DateTimeRange> list = [];
+    List<DateTimeRange> dateTimeRangeList = [];
     for (final pairs in IterableZip([listSaturday, listSunday])) {
-      list.add(DateTimeRange(start: pairs[0], end: pairs[1]));
+      dateTimeRangeList.add(DateTimeRange(start: pairs[0], end: pairs[1]));
     }
-    return list;
+    return dateTimeRangeList;
   }
 
   @override
@@ -175,39 +175,40 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
       userId: loggedInUser.uid,
     );
 
-    functionSaturday(itemsSaturday);
-    functionSunday(itemsSunday);
+    addSaturday(itemsSaturday);
+    addSunday(itemsSunday);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.fromLTRB(5, 50, 5, 0),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
+      padding: const EdgeInsets.fromLTRB(5, 50, 5, 0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
         ),
-        child: isLoading
-            ? const SpinKitChasingDots(
-                color: Colors.black,
-                duration: Duration(seconds: 3),
-              )
-            : BookingCalendar(
-                bookingService: reservationService,
-                getBookingStream: getBookingStreamFirebase,
-                uploadBooking: uploadBooking,
-                convertStreamResultToDateTimeRanges: convertStreamResultMock,
-                bookingButtonText: 'SUBMIT',
-                bookingButtonColor: kButtonColor,
-                loadingWidget: const LinearProgressIndicator(),
-                uploadingWidget: const LinearProgressIndicator(),
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                pauseSlots: generatePauseSlots(),
-                hideBreakTime: false,
-                bookingGridCrossAxisCount: 2,
-              ));
+      ),
+      child: isLoading
+          ? const SpinKitChasingDots(
+              color: Colors.black,
+              duration: Duration(seconds: 3),
+            )
+          : BookingCalendar(
+              bookingService: reservationService,
+              getBookingStream: getBookingStreamFirebase,
+              uploadBooking: uploadBooking,
+              convertStreamResultToDateTimeRanges: convertStreamResultMock,
+              bookingButtonText: 'SUBMIT',
+              bookingButtonColor: kButtonColor,
+              loadingWidget: const LinearProgressIndicator(),
+              uploadingWidget: const LinearProgressIndicator(),
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              pauseSlots: generatePauseSlots(),
+              hideBreakTime: false,
+              bookingGridCrossAxisCount: 2,
+            ),
+    );
   }
 }
