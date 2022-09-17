@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:reservation_app/components/bottom_sheet.dart';
 import 'package:reservation_app/components/reservation_details.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
@@ -101,14 +100,41 @@ class _MainMenuState extends State<MainMenu> {
               automaticallyImplyLeading: false,
               backgroundColor: kButtonColor,
               title: Text(
-                'Welcome $username !',
+                username != null
+                    ? 'Welcome $username !'
+                    : 'Welcome ${_auth.currentUser!.displayName}',
                 style: kGoogleFonts,
               ),
               actions: [
                 GestureDetector(
                   onTap: () {
-                    signoutUser();
-                    Navigator.pushNamed(context, WelcomeScreen.id);
+                    Alert(
+                      context: context,
+                      type: AlertType.warning,
+                      title: "SIGN OUT!",
+                      desc: "Are you sure?",
+                      buttons: [
+                        DialogButton(
+                          onPressed: () {
+                            signoutUser();
+                            Navigator.pushNamed(context, WelcomeScreen.id);
+                          },
+                          color: kButtonColor,
+                          child: const Text(
+                            "YES",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                        DialogButton(
+                          onPressed: () => Navigator.pop(context),
+                          color: kButtonColor,
+                          child: const Text(
+                            "NO",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        )
+                      ],
+                    ).show();
                   },
                   child: const Padding(
                     padding: EdgeInsets.only(right: 10.0),
@@ -230,9 +256,7 @@ class _MainMenuState extends State<MainMenu> {
                                                         Navigator.pop(context);
                                                         deleteData(index);
                                                       },
-                                                      color:
-                                                          const Color.fromRGBO(
-                                                              0, 179, 134, 1.0),
+                                                      color: kButtonColor,
                                                       child: const Text(
                                                         "YES",
                                                         style: TextStyle(
@@ -244,14 +268,7 @@ class _MainMenuState extends State<MainMenu> {
                                                       onPressed: () =>
                                                           Navigator.pop(
                                                               context),
-                                                      gradient:
-                                                          const LinearGradient(
-                                                              colors: [
-                                                            Color.fromRGBO(116,
-                                                                116, 191, 1.0),
-                                                            Color.fromRGBO(52,
-                                                                138, 199, 1.0)
-                                                          ]),
+                                                      color: kButtonColor,
                                                       child: const Text(
                                                         "NO",
                                                         style: TextStyle(
@@ -281,30 +298,6 @@ class _MainMenuState extends State<MainMenu> {
   }
 }
 
-/* getReservation() async {
-    isLoading = true;
-    final docRef = await _firestore
-        .collection('user')
-        .doc(loggedInUser.uid)
-        .collection('reservation')
-        .get();
-    /*  await docRef.then(
-      (QuerySnapshot snapshot) {
-        final data = snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          setState(() {
-            fireData = documentSnapshot.data() as Map<String, dynamic>;
-            isLoading = false;
-          });
-        });
-      },  */
-    for (var snapshot in docRef.docs) {
-      final data = snapshot.data();
-      print(data);
-      fireList.add(data);
-    }
-    /*  onError: (e) => print("Error getting document: $e"),
-    ); */
-  } */
 
 /*   updateData() async {
     final docRef = _firestore

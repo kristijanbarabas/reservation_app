@@ -113,7 +113,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             // REGISTER BUTTON
             RoundedButton(
               iconData: Icons.app_registration_rounded,
-              googleFonts: kGoogleFonts,
+              textStyle: kGoogleFonts,
               color: kButtonColor,
               title: kRegisterTitle,
               onPressed: () async {

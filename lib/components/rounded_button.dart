@@ -6,10 +6,10 @@ class RoundedButton extends StatelessWidget {
       required this.color,
       required this.title,
       required this.onPressed,
-      required this.googleFonts,
+      required this.textStyle,
       required this.iconData})
       : super(key: key);
-  final TextStyle googleFonts;
+  final TextStyle textStyle;
   final Color color;
   final String title;
   final VoidCallback onPressed;
@@ -31,10 +31,10 @@ class RoundedButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Icon(iconData),
-              SizedBox(
+              const SizedBox(
                 width: 20.0,
               ),
-              Text(title, style: googleFonts),
+              Text(title, style: textStyle),
             ],
           ),
         ),

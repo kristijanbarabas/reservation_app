@@ -36,7 +36,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 iconData: Icons.login,
                 color: kButtonColor,
                 title: kLoginTitle,
-                googleFonts: kGoogleFonts,
+                textStyle: kGoogleFonts,
                 onPressed: () {
                   Navigator.pushNamed(context, LoginScreen.id);
                 }),
@@ -45,7 +45,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 iconData: Icons.app_registration_rounded,
                 color: kButtonColor,
                 title: kRegisterTitle,
-                googleFonts: kGoogleFonts,
+                textStyle: kGoogleFonts,
                 onPressed: () {
                   Navigator.pushNamed(context, RegistrationScreen.id);
                 })

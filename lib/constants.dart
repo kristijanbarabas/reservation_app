@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// BACKGROUND
-
-const Color kBackgroundColor = Color(0xff363835);
-
 // BUTTON FONT AND STYLE
 final TextStyle kGoogleFonts = GoogleFonts.rancho(
   textStyle: const TextStyle(
@@ -13,30 +9,33 @@ final TextStyle kGoogleFonts = GoogleFonts.rancho(
       fontWeight: FontWeight.w700,
       letterSpacing: 2.0),
 );
-final TextStyle kMainMenuFonts = GoogleFonts.rancho(
+final TextStyle kMainMenuFonts = GoogleFonts.roboto(
   textStyle: const TextStyle(
       fontSize: 20.0, color: Colors.white, fontWeight: FontWeight.w700),
 );
 
-final TextStyle kTextFieldInputStyle = GoogleFonts.rancho(
+final TextStyle kTextFieldInputStyle = GoogleFonts.roboto(
   textStyle: const TextStyle(
-      fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.w700),
+      fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.w700),
 );
+// COLORS
 
+const Color kBackgroundColor = Color(0xff363835);
 const Color kButtonColor = Color(0xff415A30);
+const Color kModalSheetRadiusColor = Color(0xff191a18);
 
 // BUTTON TITLES
-const String kLoginTitle = 'Log in';
+const String kLoginTitle = 'Sign in';
 const String kRegisterTitle = 'Register';
 const String kSubmit = 'Submit';
-
+const String kEditProfile = 'Edit Profile';
 // TEXT FIELD DECORATION
 
 var kTextFieldDecoration = InputDecoration(
-  hintStyle: TextStyle(
+  hintStyle: GoogleFonts.roboto(
     color: Colors.white.withOpacity(0.5),
   ),
-  labelStyle: TextStyle(
+  labelStyle: GoogleFonts.roboto(
     color: Colors.white.withOpacity(0.5),
   ),
   contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
@@ -53,34 +52,16 @@ var kTextFieldDecoration = InputDecoration(
   ),
 );
 
+// GOOGLE LOG-ING TEXT
+TextStyle kGoogleLoginStyle = GoogleFonts.roboto(
+    fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.w500);
+
 // RESERVATION DETAILS SCREEN
 
-const TextStyle kReservationDetails =
-    TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500, color: Colors.white);
+TextStyle kReservationDetails = GoogleFonts.roboto(
+    fontSize: 20.0, fontWeight: FontWeight.w500, color: Colors.white);
 
 // dropdownbutton list
-
-List<String> dropdownButtonList = [
-  '8:00 - 10:00',
-  '10:00 - 12:00',
-  '12:00 - 14:00',
-  '14:00 - 16:00',
-];
-
-// TITLE COLORS
-const Color color1 = Color(0xff878986);
-const Color color2 = Color.fromARGB(255, 255, 88, 141);
-const Color color3 = Color.fromARGB(255, 147, 255, 179);
-const Color color4 = Color.fromARGB(255, 255, 238, 88);
-const Color color5 = Color.fromARGB(255, 7, 56, 22);
-
-final colorizeColors = [
-  color1,
-  color2,
-  color3,
-  color4,
-  color5,
-];
 
 // RESERVATION TEXT
 

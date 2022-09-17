@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:reservation_app/components/booking_calendar.dart';
 import 'package:reservation_app/screens/home.dart';
 import 'package:reservation_app/screens/login_screen.dart';
 import 'package:reservation_app/screens/registration_screen.dart';
@@ -25,6 +26,7 @@ class ReservationApp extends StatelessWidget {
         RegistrationScreen.id: (context) => const RegistrationScreen(),
         LoginScreen.id: (context) => const LoginScreen(),
         HomeScreen.id: (context) => const HomeScreen(),
+        CustomBookingCalendar.id: (context) => const CustomBookingCalendar(),
       },
     );
   }

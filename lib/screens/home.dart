@@ -8,7 +8,7 @@ import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/profile_screen.dart';
 
-import '../components/bottom_sheet.dart';
+import '../components/booking_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -84,8 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late List<Widget> screens = [
     MainMenu(userID: loggedInUser.uid),
-    const CustomBottomSheet(),
+    const CustomBookingCalendar(),
     ProfileScreen(
+      email: loggedInUser.email!,
       username: username,
     ),
   ];

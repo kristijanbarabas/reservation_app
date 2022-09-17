@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // LOGIN BUTTON
             RoundedButton(
               iconData: Icons.login,
-              googleFonts: kGoogleFonts,
+              textStyle: kGoogleFonts,
               color: kButtonColor,
               title: kLoginTitle,
               onPressed: () async {
@@ -133,18 +133,34 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 24.0,
             ),
+            Center(
+              child: Text(
+                'Sign in with Google:',
+                style: kGoogleLoginStyle,
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
             // GOOGLE LOGIN BUTTON
             GestureDetector(
               onTap: () {
+                signInWithGoogle();
+                final docRef = _firestore
+                    .collection('user')
+                    .doc(_auth.currentUser!.uid)
+                    .collection('profile')
+                    .doc(_auth.currentUser!.uid);
                 try {
-                  signInWithGoogle();
                   if (_auth.currentUser!.uid != null) {
-                    _firestore
-                        .collection('user')
-                        .doc(_auth.currentUser!.uid)
-                        .collection('profile')
-                        .add({
-                      'username': _auth.currentUser!.displayName,
+                    docRef.get().then((DocumentSnapshot document) {
+                      if (document.exists) {
+                        print('okay');
+                      } else {
+                        docRef.set({
+                          'username': _auth.currentUser!.displayName,
+                        });
+                      }
                     });
                     Navigator.pushNamed(context, HomeScreen.id);
                   }

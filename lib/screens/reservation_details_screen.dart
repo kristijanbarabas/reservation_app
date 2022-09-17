@@ -81,12 +81,15 @@ class _ReservationScreenState extends State<ReservationScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Reservation Date: ${widget.reservationDate},',
-                style: kGoogleFonts,
+                'Reservation Date:\n${widget.reservationDate}',
+                style: kMainMenuFonts,
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Text(
-                'Reservation Time: ${widget.reservationTime}',
-                style: kGoogleFonts,
+                'Reservation Time:\n${widget.reservationTime}',
+                style: kMainMenuFonts,
               )
             ],
           ),

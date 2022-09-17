@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reservation_app/data.dart';
+import 'package:reservation_app/screens/home.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
@@ -14,25 +15,21 @@ late User loggedInUser;
 final _firestore = FirebaseFirestore.instance;
 // DATE
 DateTime date = DateTime.now();
-CollectionReference reservationBookingStream = _firestore
-    .collection('reservation')
-    .doc('reservation')
-    .collection('reservation');
+CollectionReference reservationBookingStream = _firestore.collection('user');
 CollectionReference reservation =
     _firestore.collection('user').doc('reservation').collection('reservation');
-CollectionReference reservationList =
-    _firestore.collection('user').doc().collection('reservation');
 
-class CustomBottomSheet extends StatefulWidget {
-  const CustomBottomSheet({
+class CustomBookingCalendar extends StatefulWidget {
+  static const String id = 'custom_bottom_sheet';
+  const CustomBookingCalendar({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<CustomBottomSheet> createState() => _CustomBottomSheetState();
+  State<CustomBookingCalendar> createState() => _CustomBookingCalendarState();
 }
 
-class _CustomBottomSheetState extends State<CustomBottomSheet> {
+class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
   // firebase auth
   final _auth = FirebaseAuth.instance;
 
@@ -61,10 +58,13 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   ///This is how can you get the reference to your data from the collection, and serialize the data with the help of the Firestore [withConverter]. This function would be in your repository.
   CollectionReference<Data> getBookingStream({required String placeId}) {
-    return reservation.withConverter<Data>(
-      fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
-      toFirestore: (snapshots, _) => snapshots.toJson(),
-    );
+    return reservationBookingStream
+        .doc(placeId)
+        .collection('reservation')
+        .withConverter<Data>(
+          fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
+          toFirestore: (snapshots, _) => snapshots.toJson(),
+        );
   }
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
@@ -90,12 +90,14 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
       desc: "Your reservation has been added.",
       buttons: [
         DialogButton(
-          child: Text(
+          onPressed: () {
+            Navigator.pushNamed(context, HomeScreen.id);
+          },
+          width: 120,
+          child: const Text(
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
         )
       ],
     ).show();
@@ -103,13 +105,13 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   late List<DateTimeRange> converted = [];
 
-  List<DateTimeRange> convertStreamResultMock({required dynamic streamResult}) {
+  List<DateTimeRange> convertStreamResult({required dynamic streamResult}) {
     {
       final docRef = reservation.get();
       docRef.then((QuerySnapshot snapshot) {
         snapshot.docs.forEach((DocumentSnapshot doc) {
           Map<String, dynamic> fireData = doc.data() as Map<String, dynamic>;
-          print('this is : $fireData');
+          // print('this is : $fireData');
           final String reservationTime = fireData['bookingStart'];
           final DateTime parsedReservationTime =
               DateTime.parse(reservationTime);
@@ -199,7 +201,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               bookingService: reservationService,
               getBookingStream: getBookingStreamFirebase,
               uploadBooking: uploadBooking,
-              convertStreamResultToDateTimeRanges: convertStreamResultMock,
+              convertStreamResultToDateTimeRanges: convertStreamResult,
               bookingButtonText: 'SUBMIT',
               bookingButtonColor: kButtonColor,
               loadingWidget: const LinearProgressIndicator(),
