@@ -4,9 +4,15 @@ import 'package:reservation_app/constants.dart';
 class ReservationDetails extends StatelessWidget {
   final String reservationTime;
   final String reservationDate;
+  final DateTime date;
+  final String reservationEnd;
 
   const ReservationDetails(
-      {Key? key, this.reservationTime = '', this.reservationDate = ''})
+      {Key? key,
+      this.reservationTime = '',
+      this.reservationDate = '',
+      required this.date,
+      required this.reservationEnd})
       : super(key: key);
 
   @override

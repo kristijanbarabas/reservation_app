@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // PROFILE DATA
   late Map<String, dynamic> fireProfile = {};
   late String username = fireProfile['username'];
+  late String phoneNumber = fireProfile['userPhoneNumber'];
   getCurrentUser() {
     try {
       final user = _auth.currentUser;
@@ -88,6 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfileScreen(
       email: loggedInUser.email!,
       username: username,
+      phoneNumber: loggedInUser.phoneNumber == null
+          ? phoneNumber
+          : loggedInUser.phoneNumber,
     ),
   ];
 

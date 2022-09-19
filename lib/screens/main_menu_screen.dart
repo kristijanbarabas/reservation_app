@@ -69,7 +69,25 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  void deleteData(int index) async {
+  void deleteData(String bookingEnd) async {
+    print('click');
+    final docRef = _firestore
+        .collection('user')
+        .doc('reservation')
+        .collection('reservation')
+        .where('bookingEnd', isEqualTo: bookingEnd)
+        .get();
+    print('got it');
+    print(bookingEnd);
+    await docRef.then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.delete();
+        print('done');
+      });
+    });
+  }
+
+  /*  void deleteData(int index) async {
     final docRef = _firestore
         .collection('user')
         .doc('reservation')
@@ -78,7 +96,7 @@ class _MainMenuState extends State<MainMenu> {
         .get();
     await docRef.then((QuerySnapshot querySnapshot) =>
         {querySnapshot.docs[index].reference.delete()});
-  }
+  } */
 
   @override
   void initState() {
@@ -196,25 +214,29 @@ class _MainMenuState extends State<MainMenu> {
                                   for (var snapshot in reservation) {
                                     Map<String, dynamic> fireData =
                                         snapshot.data() as Map<String, dynamic>;
-                                    final String reservationStart =
+                                    final String bookingStart =
                                         fireData['bookingStart'];
                                     final DateTime parsedReservationStart =
-                                        DateTime.parse(reservationStart);
-                                    final reservationEnd =
-                                        fireData['bookingEnd'];
+                                        DateTime.parse(bookingStart);
+                                    final bookingEnd = fireData['bookingEnd'];
                                     final DateTime parsedReservationEnd =
-                                        DateTime.parse(reservationEnd);
+                                        DateTime.parse(bookingEnd);
                                     final String sortReservationDate =
                                         '${parsedReservationEnd.day}.${parsedReservationEnd.month}.${parsedReservationEnd.year}';
 
                                     final reservationWidget =
                                         ReservationDetails(
+                                      date: parsedReservationEnd,
+                                      reservationEnd: bookingEnd,
                                       reservationTime:
                                           '${parsedReservationStart.hour}:00 - ${parsedReservationEnd.hour}:00',
                                       reservationDate: sortReservationDate,
                                     );
 
                                     reservationList.add(reservationWidget);
+
+                                    reservationList.sort(
+                                        (a, b) => a.date.compareTo(b.date));
                                   }
                                   return Row(
                                     children: [
@@ -224,7 +246,7 @@ class _MainMenuState extends State<MainMenu> {
                                         itemBuilder:
                                             (BuildContext context, int index) {
                                           return GestureDetector(
-                                              onTap: () {
+                                              /* onTap: () {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
@@ -241,9 +263,15 @@ class _MainMenuState extends State<MainMenu> {
                                                         )),
                                                   ),
                                                 );
-                                              },
+                                              }, */
 
                                               // DELETE FUNCTION
+                                              onDoubleTap: () {
+                                                print(index);
+                                                print(reservationList[index]
+                                                    .reservationEnd
+                                                    .toString());
+                                              },
                                               onLongPress: () {
                                                 Alert(
                                                   context: context,
@@ -254,7 +282,10 @@ class _MainMenuState extends State<MainMenu> {
                                                     DialogButton(
                                                       onPressed: () {
                                                         Navigator.pop(context);
-                                                        deleteData(index);
+                                                        deleteData(
+                                                            reservationList[
+                                                                    index]
+                                                                .reservationEnd);
                                                       },
                                                       color: kButtonColor,
                                                       child: const Text(

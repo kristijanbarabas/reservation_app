@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:reservation_app/components/rounded_button.dart';
@@ -8,15 +9,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final _firestore = FirebaseFirestore.instance;
-
 late User loggedInUser;
 
 class ProfileScreen extends StatefulWidget {
   static const String id = 'profile_screen';
   late String username;
+  late String? phoneNumber;
   final String email;
 
-  ProfileScreen({Key? key, required this.username, required this.email})
+  ProfileScreen(
+      {Key? key,
+      required this.username,
+      required this.email,
+      required this.phoneNumber})
       : super(key: key);
 
   @override
@@ -43,7 +48,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .doc(loggedInUser.uid)
         .collection('profile')
         .doc(loggedInUser.uid);
-    await docRef.set({'username': widget.username}, SetOptions(merge: true));
+    await docRef.set(
+        {'username': widget.username, 'userPhoneNumber': widget.phoneNumber},
+        SetOptions(merge: true));
   }
 
   @override
@@ -116,6 +123,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   widget.username = value!;
                                 },
                               ),
+                              TextFieldWidget(
+                                initialValue: widget.phoneNumber == null
+                                    ? 'Add a phone number...'
+                                    : widget.phoneNumber!,
+                                newValue: (value) {
+                                  widget.phoneNumber = value!;
+                                },
+                              ),
                               RoundedButton(
                                   color: kButtonColor,
                                   title: kSubmit,
@@ -142,59 +157,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: kGoogleFonts,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
-                const CircleAvatar(
-                  backgroundColor: kButtonColor,
-                  radius: 70.0,
-                  child: FaIcon(FontAwesomeIcons.faceGrin,
-                      size: 100, color: Colors.white),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: _firestore
+              .collection('user')
+              .doc(loggedInUser.uid)
+              .collection('profile')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: SpinKitChasingDots(
+                  color: Colors.black,
+                  duration: Duration(seconds: 3),
                 ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: const CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.edit,
-                        color: kBackgroundColor,
+              );
+            } else {
+              final profile = snapshot.data!.docs;
+              Map<String, dynamic> profileData = {};
+              late String username = profileData['username'];
+              late String phoneNumber = profileData['userPhoneNumber'];
+              for (var snapshot in profile) {
+                profileData = snapshot.data() as Map<String, dynamic>;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Stack(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: kButtonColor,
+                          radius: 70.0,
+                          child: FaIcon(FontAwesomeIcons.faceGrin,
+                              size: 100, color: Colors.white),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: const CircleAvatar(
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.edit,
+                                color: kBackgroundColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        username == null
+                            ? 'Add a username number...'
+                            : username,
+                        style: kMainMenuFonts,
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        phoneNumber == null
+                            ? 'Add a phone number...'
+                            : phoneNumber,
+                        style: kMainMenuFonts,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${widget.email}',
+                        style: kMainMenuFonts,
+                      ),
+                    )
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                '${widget.username}',
-                style: kMainMenuFonts,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                '${widget.email}',
-                style: kMainMenuFonts,
-              ),
-            )
-          ],
-        ),
-      ),
+              );
+            }
+          }),
     );
   }
 }
