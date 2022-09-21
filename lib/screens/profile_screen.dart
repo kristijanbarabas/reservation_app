@@ -1,12 +1,18 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:reservation_app/components/cloud_storage.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
 late User loggedInUser;
@@ -29,6 +35,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool isLoading = true;
+
+  final CloudStorage storage = CloudStorage();
 // authentification
   final _auth = FirebaseAuth.instance;
   getCurrentUser() {
@@ -53,18 +62,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SetOptions(merge: true));
   }
 
+  File? image;
+
+  Future pickImage(source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+      final imagePermanent = File(image.path);
+      setState(() {
+        this.image = imagePermanent;
+      });
+      await storage.uploadFile(image.path, loggedInUser.uid).then(
+            (value) => print('Done'),
+          );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  late String imageUrl;
+
+  getProfileImage() async {
+    isLoading = true;
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('${loggedInUser.uid}/profilepicture.jpg');
+    String url = await ref.getDownloadURL();
+    setState(() {
+      imageUrl = url;
+    });
+    isLoading = false;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getCurrentUser();
-  }
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is removed from the widget tree.
-    // This also removes the _printLatestValue listener.
-    super.dispose();
+    getProfileImage();
   }
 
   @override
@@ -187,21 +222,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Stack(
                       children: [
-                        const CircleAvatar(
-                          backgroundColor: kButtonColor,
-                          radius: 70.0,
-                          child: FaIcon(FontAwesomeIcons.faceGrin,
-                              size: 100, color: Colors.white),
-                        ),
+                        CircleAvatar(
+                            backgroundColor: kButtonColor,
+                            radius: 70.0,
+                            child: isLoading
+                                ? const FaIcon(FontAwesomeIcons.faceGrin,
+                                    size: 100, color: Colors.white)
+                                : ClipOval(
+                                    child: Image.network(imageUrl,
+                                        height: 160,
+                                        width: 160,
+                                        fit: BoxFit.cover),
+                                  )),
                         Positioned(
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Alert(
+                                context: context,
+                                type: AlertType.warning,
+                                title: "PICK AN IMAGE!",
+                                buttons: [
+                                  DialogButton(
+                                    onPressed: () {
+                                      pickImage(ImageSource.gallery);
+                                      Navigator.pop(context);
+                                    },
+                                    color: kButtonColor,
+                                    child: const Text(
+                                      "GALLERY",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                  ),
+                                  DialogButton(
+                                    onPressed: () {
+                                      pickImage(ImageSource.camera);
+                                      Navigator.pop(context);
+                                    },
+                                    color: kButtonColor,
+                                    child: const Text(
+                                      "CAMERA",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                  )
+                                ],
+                              ).show();
+                            },
                             child: const CircleAvatar(
                               backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.edit,
+                              child: FaIcon(
+                                FontAwesomeIcons.images,
                                 color: kBackgroundColor,
                               ),
                             ),
