@@ -110,7 +110,6 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
       docRef.then((QuerySnapshot snapshot) {
         snapshot.docs.forEach((DocumentSnapshot doc) {
           Map<String, dynamic> fireData = doc.data() as Map<String, dynamic>;
-          // print('this is : $fireData');
           final String reservationTime = fireData['bookingStart'];
           final DateTime parsedReservationTime =
               DateTime.parse(reservationTime);
@@ -126,7 +125,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     return converted;
   }
 
-  final List itemsSaturday = List<DateTime>.generate(
+  /*  final List itemsSaturday = List<DateTime>.generate(
       730,
       (i) => DateTime.utc(2022, DateTime.september, 1, 7, 0)
           .add(Duration(days: i)));
@@ -162,7 +161,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
       dateTimeRangeList.add(DateTimeRange(start: pairs[0], end: pairs[1]));
     }
     return dateTimeRangeList;
-  }
+  } */
 
   @override
   void initState() {
@@ -176,8 +175,8 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
       userId: loggedInUser.uid,
     );
 
-    addSaturday(itemsSaturday);
-    addSunday(itemsSunday);
+    /* addSaturday(itemsSaturday);
+    addSunday(itemsSunday); */
   }
 
   @override
@@ -206,9 +205,9 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
               loadingWidget: const LinearProgressIndicator(),
               uploadingWidget: const LinearProgressIndicator(),
               startingDayOfWeek: StartingDayOfWeek.monday,
-              pauseSlots: generatePauseSlots(),
               hideBreakTime: false,
               bookingGridCrossAxisCount: 2,
+              disabledDays: const [6, 7],
             ),
     );
   }
