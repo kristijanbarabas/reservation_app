@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Map<String, dynamic> fireProfile = {};
   late String username = fireProfile['username'];
   late String phoneNumber = fireProfile['userPhoneNumber'];
+
   getCurrentUser() {
     try {
       final user = _auth.currentUser;
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .get();
     await docRef.then(
       (QuerySnapshot snapshot) {
-        final data = snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+        snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           setState(() {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
             isLoading = false;
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //State class
   int _pageIndex = 0;
-  GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+  GlobalKey<CurvedNavigationBarState> bottomNavigationKey = GlobalKey();
 
   List<Widget> bottomNavigationBarItems = [
     const Icon(
@@ -114,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: kBackgroundColor,
             body: screens[_pageIndex],
             bottomNavigationBar: CurvedNavigationBar(
-              key: _bottomNavigationKey,
+              key: bottomNavigationKey,
               color: kButtonColor,
               height: 60,
               backgroundColor:

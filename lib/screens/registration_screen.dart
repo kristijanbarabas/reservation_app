@@ -126,8 +126,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         .collection('user')
                         .doc(newUser.user!.uid)
                         .collection('profile')
-                        .add({
+                        .doc(newUser.user!.uid)
+                        .set({
                       'username': username,
+                      'userPhoneNumber': 'Add phone number...',
                     });
                     Navigator.pushNamed(context, HomeScreen.id);
                   }

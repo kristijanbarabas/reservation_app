@@ -45,7 +45,6 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
       final user = _auth.currentUser;
       if (user != null) {
         loggedInUser = user;
-        print(loggedInUser.email);
       }
       isLoading = false;
     } catch (e) {

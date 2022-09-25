@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:reservation_app/components/cloud_storage.dart';
+import 'package:reservation_app/screens/welcome_screen.dart';
+import 'package:reservation_app/services/cloud_storage.dart';
 import 'package:reservation_app/components/rounded_button.dart';
 import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reservation_app/services/database_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
@@ -19,7 +19,7 @@ late User loggedInUser;
 
 class ProfileScreen extends StatefulWidget {
   static const String id = 'profile_screen';
-  late String username;
+  late String username = 'Add a username...';
   late String? phoneNumber;
   final String email;
 
@@ -36,8 +36,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = true;
-
   final CloudStorage storage = CloudStorage();
+  final DatabaseService deleteService = DatabaseService();
 // authentification
   final _auth = FirebaseAuth.instance;
   getCurrentUser() {
@@ -84,109 +84,178 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   getProfileImage() async {
     isLoading = true;
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('${loggedInUser.uid}/profilepicture.jpg');
-    String url = await ref.getDownloadURL();
-    setState(() {
-      imageUrl = url;
-    });
-    isLoading = false;
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('${loggedInUser.uid}/profilepicture.jpg');
+      String url = await ref.getDownloadURL();
+      setState(() {
+        imageUrl = url;
+      });
+      isLoading = false;
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentUser();
     getProfileImage();
+  }
+
+  deleteUserProfile() async {
+    _firestore
+        .collection("user")
+        .doc(loggedInUser.uid)
+        .collection('profile')
+        .doc(loggedInUser.uid)
+        .delete();
+  }
+
+  deleteUserReservations() async {
+    final docRef = _firestore
+        .collection("user")
+        .doc('reservation')
+        .collection('reservation')
+        .where('userId', isEqualTo: loggedInUser.uid)
+        .get();
+    await docRef.then(
+      (querySnapshot) {
+        querySnapshot.docs.forEach(
+          (doc) {
+            doc.reference.delete();
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackgroundColor,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //DELETE USER ACCOUNT
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: "DELETE ACCOUNT?",
+            desc: "Are you sure you want to delete your account?",
+            buttons: [
+              DialogButton(
+                onPressed: () {
+                  deleteUserProfile();
+                  deleteUserReservations();
+                  loggedInUser.delete();
+                  Navigator.pushNamed(context, WelcomeScreen.id);
+                },
+                color: kButtonColor,
+                child: const Text(
+                  "YES",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+              DialogButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                color: kButtonColor,
+                child: const Text(
+                  "NO",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              )
+            ],
+          ).show();
+        },
+        backgroundColor: kButtonColor,
+        child: const FaIcon(FontAwesomeIcons.userSlash),
+      ),
       appBar: AppBar(
+        backgroundColor: kButtonColor,
+        automaticallyImplyLeading: false,
         actions: [
           GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      color: kModalSheetRadiusColor,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: kBackgroundColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            children: [
-                              Stack(
-                                children: [
-                                  Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Text(
-                                        kEditProfile,
-                                        style: kMainMenuFonts,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    bottom: 20,
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Icon(
-                                          Icons.clear,
-                                          color: Colors.white,
-                                        )),
-                                  ),
-                                ],
-                              ),
-                              TextFieldWidget(
-                                initialValue: widget.username,
-                                newValue: (value) {
-                                  widget.username = value!;
-                                },
-                              ),
-                              TextFieldWidget(
-                                initialValue: widget.phoneNumber == null
-                                    ? 'Add a phone number...'
-                                    : widget.phoneNumber!,
-                                newValue: (value) {
-                                  widget.phoneNumber = value!;
-                                },
-                              ),
-                              RoundedButton(
-                                  color: kButtonColor,
-                                  title: kSubmit,
-                                  onPressed: () {
-                                    updateProfile();
-                                    Navigator.pop(context);
-                                  },
-                                  textStyle: kMainMenuFonts,
-                                  iconData: Icons.done)
-                            ],
-                          ),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    color: kModalSheetRadiusColor,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: kBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
                         ),
                       ),
-                    );
-                  },
-                );
-              },
-              child: const Icon(Icons.edit))
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Text(
+                                      kEditProfile,
+                                      style: kMainMenuFonts,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  bottom: 20,
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Icon(
+                                        Icons.clear,
+                                        color: Colors.white,
+                                      )),
+                                ),
+                              ],
+                            ),
+                            TextFieldWidget(
+                              initialValue: widget.username,
+                              newValue: (value) {
+                                widget.username = value!;
+                              },
+                            ),
+                            TextFieldWidget(
+                              initialValue: widget.phoneNumber == null
+                                  ? 'Add a phone number...'
+                                  : widget.phoneNumber!,
+                              newValue: (value) {
+                                widget.phoneNumber = value!;
+                              },
+                            ),
+                            RoundedButton(
+                                color: kButtonColor,
+                                title: kSubmit,
+                                onPressed: () {
+                                  updateProfile();
+                                  Navigator.pop(context);
+                                },
+                                textStyle: kMainMenuFonts,
+                                iconData: Icons.done)
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            child: const Icon(Icons.edit),
+          ),
         ],
-        backgroundColor: kBackgroundColor,
-        automaticallyImplyLeading: false,
         title: Text(
           'Profile',
           style: kGoogleFonts,
@@ -312,7 +381,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        '${widget.email}',
+                        widget.email,
                         style: kMainMenuFonts,
                       ),
                     )

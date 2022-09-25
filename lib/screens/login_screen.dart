@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Flexible(
               child: Hero(
                 tag: 'logo',
-                child: Container(
+                child: SizedBox(
                   height: 100,
                   child: Image.asset('images/logo.png'),
                 ),
@@ -159,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       } else {
                         docRef.set({
                           'username': _auth.currentUser!.displayName,
+                          'phoneNumber': _auth.currentUser!.phoneNumber
                         });
                       }
                     });

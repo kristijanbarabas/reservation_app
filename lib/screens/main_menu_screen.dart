@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:reservation_app/components/booking_calendar.dart';
 import 'package:reservation_app/components/reservation_details.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
@@ -25,6 +27,7 @@ class _MainMenuState extends State<MainMenu> {
   bool isLoading = true;
   // PROFILE DATA
   late Map<String, dynamic> fireProfile = {};
+  late Map<String, dynamic> firebaseData = {};
   late String username = fireProfile['username'];
   // authentification
   final _auth = FirebaseAuth.instance;
@@ -58,33 +61,85 @@ class _MainMenuState extends State<MainMenu> {
         .get();
     await docRef.then(
       (QuerySnapshot snapshot) {
-        final data = snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          setState(() {
-            fireProfile = documentSnapshot.data() as Map<String, dynamic>;
-            isLoading = false;
-          });
-        });
+        snapshot.docs.forEach(
+          (DocumentSnapshot documentSnapshot) {
+            setState(
+              () {
+                fireProfile = documentSnapshot.data() as Map<String, dynamic>;
+                isLoading = false;
+              },
+            );
+          },
+        );
       },
       onError: (e) => print("Error getting document: $e"),
     );
   }
 
-  void deleteData(String bookingEnd) async {
-    print('click');
+  getDataAndDeleteExpiredReservation() async {
+    isLoading = true;
     final docRef = _firestore
         .collection('user')
         .doc('reservation')
         .collection('reservation')
-        .where('bookingEnd', isEqualTo: bookingEnd)
         .get();
-    print('got it');
-    print(bookingEnd);
-    await docRef.then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        doc.reference.delete();
-        print('done');
-      });
-    });
+    await docRef.then(
+      (QuerySnapshot snapshot) {
+        snapshot.docs.forEach(
+          (DocumentSnapshot documentSnapshot) {
+            setState(
+              () {
+                firebaseData = documentSnapshot.data() as Map<String, dynamic>;
+                String bookingStart = firebaseData['bookingStart'];
+                deleteExpiredReservation(bookingStart);
+                isLoading = false;
+              },
+            );
+          },
+        );
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+  }
+
+  void deleteReservationOnPressed(String bookingStart) async {
+    final docRef = _firestore
+        .collection('user')
+        .doc('reservation')
+        .collection('reservation')
+        .where('bookingStart', isEqualTo: bookingStart)
+        .get();
+    await docRef.then(
+      (querySnapshot) {
+        querySnapshot.docs.forEach(
+          (doc) {
+            doc.reference.delete();
+          },
+        );
+      },
+    );
+  }
+
+  void deleteExpiredReservation(String bookingStart) async {
+    DateTime expiredDate = DateTime.parse(bookingStart);
+    if (expiredDate.isBefore(DateTime.now()) == true) {
+      final docRef = _firestore
+          .collection('user')
+          .doc('reservation')
+          .collection('reservation')
+          .where('bookingStart', isEqualTo: bookingStart)
+          .get();
+      await docRef.then(
+        (querySnapshot) {
+          querySnapshot.docs.forEach(
+            (doc) {
+              final docRef = doc.reference.delete();
+              print(docRef);
+            },
+          );
+        },
+      );
+    }
   }
 
   /*  void deleteData(int index) async {
@@ -103,6 +158,7 @@ class _MainMenuState extends State<MainMenu> {
     super.initState();
     getCurrentUser();
     getProfile();
+    getDataAndDeleteExpiredReservation();
   }
 
   @override
@@ -155,8 +211,8 @@ class _MainMenuState extends State<MainMenu> {
                     ).show();
                   },
                   child: const Padding(
-                    padding: EdgeInsets.only(right: 10.0),
-                    child: Icon(Icons.clear),
+                    padding: EdgeInsets.only(top: 15.0, right: 10.0),
+                    child: FaIcon(FontAwesomeIcons.rightFromBracket),
                   ),
                 ),
               ],
@@ -266,12 +322,7 @@ class _MainMenuState extends State<MainMenu> {
                                               }, */
 
                                               // DELETE FUNCTION
-                                              onDoubleTap: () {
-                                                print(index);
-                                                print(reservationList[index]
-                                                    .reservationEnd
-                                                    .toString());
-                                              },
+
                                               onLongPress: () {
                                                 Alert(
                                                   context: context,
@@ -282,7 +333,7 @@ class _MainMenuState extends State<MainMenu> {
                                                     DialogButton(
                                                       onPressed: () {
                                                         Navigator.pop(context);
-                                                        deleteData(
+                                                        deleteReservationOnPressed(
                                                             reservationList[
                                                                     index]
                                                                 .reservationEnd);
