@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:reservation_app/components/booking_calendar.dart';
 import 'package:reservation_app/components/reservation_details.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
@@ -17,7 +16,14 @@ late User loggedInUser;
 class MainMenu extends StatefulWidget {
   static const String id = 'menu_screen';
   final String userID;
-  const MainMenu({Key? key, required this.userID}) : super(key: key);
+  final String? imageUrl;
+  final String? username;
+  const MainMenu(
+      {Key? key,
+      required this.userID,
+      required this.imageUrl,
+      required this.username})
+      : super(key: key);
 
   @override
   State<MainMenu> createState() => _MainMenuState();
@@ -25,10 +31,9 @@ class MainMenu extends StatefulWidget {
 
 class _MainMenuState extends State<MainMenu> {
   bool isLoading = true;
-  // PROFILE DATA
-  late Map<String, dynamic> fireProfile = {};
+
   late Map<String, dynamic> firebaseData = {};
-  late String username = fireProfile['username'];
+
   // authentification
   final _auth = FirebaseAuth.instance;
 
@@ -50,30 +55,6 @@ class _MainMenuState extends State<MainMenu> {
     } catch (e) {
       print('Signout Failed');
     }
-  }
-
-  getProfile() async {
-    isLoading = true;
-    final docRef = _firestore
-        .collection('user')
-        .doc(loggedInUser.uid)
-        .collection('profile')
-        .get();
-    await docRef.then(
-      (QuerySnapshot snapshot) {
-        snapshot.docs.forEach(
-          (DocumentSnapshot documentSnapshot) {
-            setState(
-              () {
-                fireProfile = documentSnapshot.data() as Map<String, dynamic>;
-                isLoading = false;
-              },
-            );
-          },
-        );
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
   }
 
   getDataAndDeleteExpiredReservation() async {
@@ -102,12 +83,12 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  void deleteReservationOnPressed(String bookingStart) async {
+  void deleteReservationOnPressed(String bookingEnd) async {
     final docRef = _firestore
         .collection('user')
         .doc('reservation')
         .collection('reservation')
-        .where('bookingStart', isEqualTo: bookingStart)
+        .where('bookingEnd', isEqualTo: bookingEnd)
         .get();
     await docRef.then(
       (querySnapshot) {
@@ -157,7 +138,7 @@ class _MainMenuState extends State<MainMenu> {
   void initState() {
     super.initState();
     getCurrentUser();
-    getProfile();
+
     getDataAndDeleteExpiredReservation();
   }
 
@@ -173,9 +154,19 @@ class _MainMenuState extends State<MainMenu> {
             appBar: AppBar(
               automaticallyImplyLeading: false,
               backgroundColor: kButtonColor,
+              leading: CircleAvatar(
+                  backgroundColor: kButtonColor,
+                  radius: 100.0,
+                  child: widget.imageUrl == null
+                      ? const FaIcon(FontAwesomeIcons.faceGrin,
+                          size: 100, color: Colors.white)
+                      : ClipOval(
+                          child: Image.network(widget.imageUrl!,
+                              height: 50, width: 50, fit: BoxFit.cover),
+                        )),
               title: Text(
-                username != null
-                    ? 'Welcome $username !'
+                widget.username != null
+                    ? 'Welcome ${widget.username} !'
                     : 'Welcome ${_auth.currentUser!.displayName}',
                 style: kGoogleFonts,
               ),
@@ -241,133 +232,126 @@ class _MainMenuState extends State<MainMenu> {
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.white),
                           borderRadius: BorderRadius.circular(10.0)),
-                      child: isLoading
-                          ? const SpinKitChasingDots(
-                              color: Colors.black,
-                              duration: Duration(seconds: 3),
-                            )
-                          : StreamBuilder<QuerySnapshot>(
-                              stream: _firestore
-                                  .collection('user')
-                                  .doc('reservation')
-                                  .collection('reservation')
-                                  .where('userId', isEqualTo: loggedInUser.uid)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return const Center(
-                                    child: SpinKitChasingDots(
-                                      color: Colors.black,
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  );
-                                } else {
-                                  final reservation = snapshot.data!.docs;
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: _firestore
+                              .collection('user')
+                              .doc('reservation')
+                              .collection('reservation')
+                              .where('userId', isEqualTo: loggedInUser.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                child: SpinKitChasingDots(
+                                  color: Colors.black,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            } else {
+                              final reservation = snapshot.data!.docs;
 
-                                  // list of widgets
-                                  List<ReservationDetails> reservationList = [];
-                                  //
-                                  for (var snapshot in reservation) {
-                                    Map<String, dynamic> fireData =
-                                        snapshot.data() as Map<String, dynamic>;
-                                    final String bookingStart =
-                                        fireData['bookingStart'];
-                                    final DateTime parsedReservationStart =
-                                        DateTime.parse(bookingStart);
-                                    final bookingEnd = fireData['bookingEnd'];
-                                    final DateTime parsedReservationEnd =
-                                        DateTime.parse(bookingEnd);
-                                    final String sortReservationDate =
-                                        '${parsedReservationEnd.day}.${parsedReservationEnd.month}.${parsedReservationEnd.year}';
+                              // list of widgets
+                              List<ReservationDetails> reservationList = [];
+                              //
+                              for (var snapshot in reservation) {
+                                Map<String, dynamic> fireData =
+                                    snapshot.data() as Map<String, dynamic>;
+                                final String bookingStart =
+                                    fireData['bookingStart'];
+                                final DateTime parsedReservationStart =
+                                    DateTime.parse(bookingStart);
+                                final bookingEnd = fireData['bookingEnd'];
+                                final DateTime parsedReservationEnd =
+                                    DateTime.parse(bookingEnd);
+                                final String sortReservationDate =
+                                    '${parsedReservationEnd.day}.${parsedReservationEnd.month}.${parsedReservationEnd.year}';
 
-                                    final reservationWidget =
-                                        ReservationDetails(
-                                      date: parsedReservationEnd,
-                                      reservationEnd: bookingEnd,
-                                      reservationTime:
-                                          '${parsedReservationStart.hour}:00 - ${parsedReservationEnd.hour}:00',
-                                      reservationDate: sortReservationDate,
-                                    );
+                                final reservationWidget = ReservationDetails(
+                                  date: parsedReservationEnd,
+                                  reservationEnd: bookingEnd,
+                                  reservationTime:
+                                      '${parsedReservationStart.hour}:00 - ${parsedReservationEnd.hour}:00',
+                                  reservationDate: sortReservationDate,
+                                );
 
-                                    reservationList.add(reservationWidget);
+                                reservationList.add(reservationWidget);
 
-                                    reservationList.sort(
-                                        (a, b) => a.date.compareTo(b.date));
-                                  }
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                          child: ListView.builder(
-                                        itemCount: reservationList.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return GestureDetector(
-                                              /* onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: ((context) =>
-                                                        ReservationScreen(
-                                                          reservationDate:
-                                                              reservationList[
-                                                                      index]
-                                                                  .reservationDate,
-                                                          reservationTime:
-                                                              reservationList[
-                                                                      index]
-                                                                  .reservationTime,
-                                                        )),
+                                reservationList
+                                    .sort((a, b) => a.date.compareTo(b.date));
+                              }
+                              return Row(
+                                children: [
+                                  Expanded(
+                                      child: ListView.builder(
+                                    itemCount: reservationList.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return GestureDetector(
+                                          // ROUTE TO RESERVATION SCREEN DETAILS
+                                          /*  onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: ((context) =>
+                                                    ReservationScreen(
+                                                      reservationDate:
+                                                          reservationList[index]
+                                                              .reservationDate,
+                                                      reservationTime:
+                                                          reservationList[index]
+                                                              .reservationTime,
+                                                    )),
+                                              ),
+                                            );
+                                          }, */
+                                          // DELETE FUNCTION
+                                          onDoubleTap: () {
+                                            print(reservationList[index]
+                                                .reservationEnd);
+                                          },
+                                          onLongPress: () {
+                                            Alert(
+                                              context: context,
+                                              type: AlertType.warning,
+                                              title: "DELETE RESERVATION!",
+                                              desc: "Are you sure?",
+                                              buttons: [
+                                                DialogButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    deleteReservationOnPressed(
+                                                        reservationList[index]
+                                                            .reservationEnd);
+                                                  },
+                                                  color: kButtonColor,
+                                                  child: const Text(
+                                                    "YES",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20),
                                                   ),
-                                                );
-                                              }, */
-
-                                              // DELETE FUNCTION
-
-                                              onLongPress: () {
-                                                Alert(
-                                                  context: context,
-                                                  type: AlertType.warning,
-                                                  title: "DELETE RESERVATION!",
-                                                  desc: "Are you sure?",
-                                                  buttons: [
-                                                    DialogButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                        deleteReservationOnPressed(
-                                                            reservationList[
-                                                                    index]
-                                                                .reservationEnd);
-                                                      },
-                                                      color: kButtonColor,
-                                                      child: const Text(
-                                                        "YES",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20),
-                                                      ),
-                                                    ),
-                                                    DialogButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              context),
-                                                      color: kButtonColor,
-                                                      child: const Text(
-                                                        "NO",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ).show();
-                                              },
-                                              child: reservationList[index]);
-                                        },
-                                      )),
-                                    ],
-                                  );
-                                }
-                              }),
+                                                ),
+                                                DialogButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  color: kButtonColor,
+                                                  child: const Text(
+                                                    "NO",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20),
+                                                  ),
+                                                )
+                                              ],
+                                            ).show();
+                                          },
+                                          child: reservationList[index]);
+                                    },
+                                  )),
+                                ],
+                              );
+                            }
+                          }),
                     ),
                   ),
                   const SizedBox(

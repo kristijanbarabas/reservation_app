@@ -48,6 +48,7 @@ class ReservationDetails extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
+                    onTap: () {},
                     child: const Icon(Icons.delete, color: Colors.white)),
               ],
             ),

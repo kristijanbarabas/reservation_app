@@ -205,7 +205,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
               loadingWidget: const LinearProgressIndicator(),
               uploadingWidget: const LinearProgressIndicator(),
               startingDayOfWeek: StartingDayOfWeek.monday,
-              hideBreakTime: false,
+              hideBreakTime: true,
               bookingGridCrossAxisCount: 2,
               disabledDays: const [6, 7],
             ),

@@ -69,12 +69,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
         appBar: AppBar(
           backgroundColor: kButtonColor,
           title: const Text('Reservation Details'),
-          actions: [
-            GestureDetector(
-              onTap: () {},
-              child: Icon(Icons.edit),
-            ),
-          ],
         ),
         body: Center(
           child: Column(

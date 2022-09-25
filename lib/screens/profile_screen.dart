@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,15 +18,17 @@ late User loggedInUser;
 
 class ProfileScreen extends StatefulWidget {
   static const String id = 'profile_screen';
-  late String username = 'Add a username...';
+  late String? username;
   late String? phoneNumber;
   final String email;
+  final String? imageUrl;
 
   ProfileScreen(
       {Key? key,
       required this.username,
       required this.email,
-      required this.phoneNumber})
+      required this.phoneNumber,
+      required this.imageUrl})
       : super(key: key);
 
   @override
@@ -35,7 +36,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool isLoading = true;
   final CloudStorage storage = CloudStorage();
   final DatabaseService deleteService = DatabaseService();
 // authentification
@@ -80,29 +80,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  late String imageUrl;
-
-  getProfileImage() async {
-    isLoading = true;
-    try {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('${loggedInUser.uid}/profilepicture.jpg');
-      String url = await ref.getDownloadURL();
-      setState(() {
-        imageUrl = url;
-      });
-      isLoading = false;
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     getCurrentUser();
-    getProfileImage();
   }
 
   deleteUserProfile() async {
@@ -223,7 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             TextFieldWidget(
-                              initialValue: widget.username,
+                              initialValue: widget.username == null
+                                  ? 'Add a username...'
+                                  : widget.username!,
                               newValue: (value) {
                                 widget.username = value!;
                               },
@@ -293,14 +276,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         CircleAvatar(
                             backgroundColor: kButtonColor,
-                            radius: 70.0,
-                            child: isLoading
+                            radius: 100.0,
+                            child: widget.imageUrl == null
                                 ? const FaIcon(FontAwesomeIcons.faceGrin,
                                     size: 100, color: Colors.white)
                                 : ClipOval(
-                                    child: Image.network(imageUrl,
-                                        height: 160,
-                                        width: 160,
+                                    child: Image.network(widget.imageUrl!,
+                                        height: 200,
+                                        width: 200,
                                         fit: BoxFit.cover),
                                   )),
                         Positioned(

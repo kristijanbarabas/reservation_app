@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,7 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // PROFILE DATA
   late Map<String, dynamic> fireProfile = {};
   late String username = fireProfile['username'];
-  late String phoneNumber = fireProfile['userPhoneNumber'];
+  late String? phoneNumber = fireProfile['userPhoneNumber'];
+  String? imageUrl = '';
 
   getCurrentUser() {
     try {
@@ -62,6 +64,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  getProfileImage() async {
+    isLoading = true;
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('${loggedInUser.uid}/profilepicture.jpg');
+      String url = await ref.getDownloadURL();
+      setState(() {
+        imageUrl = url;
+      });
+      isLoading = false;
+    } catch (e) {
+      print(e);
+    }
+  }
+
   //State class
   int _pageIndex = 0;
   GlobalKey<CurvedNavigationBarState> bottomNavigationKey = GlobalKey();
@@ -85,9 +103,14 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   late List<Widget> screens = [
-    MainMenu(userID: loggedInUser.uid),
+    MainMenu(
+      username: username,
+      userID: loggedInUser.uid,
+      imageUrl: imageUrl,
+    ),
     const CustomBookingCalendar(),
     ProfileScreen(
+      imageUrl: imageUrl,
       email: loggedInUser.email!,
       username: username,
       phoneNumber: loggedInUser.phoneNumber == null
@@ -98,9 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentUser();
+    getProfileImage();
     getProfile();
   }
 
