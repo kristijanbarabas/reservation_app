@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_auth.currentUser!.uid != null) {
                     docRef.get().then((DocumentSnapshot document) {
                       if (document.exists) {
-                        print('okay');
+                        // DO NOTHING
                       } else {
                         docRef.set({
                           'username': _auth.currentUser!.displayName,

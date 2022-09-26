@@ -277,7 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                             backgroundColor: kButtonColor,
                             radius: 100.0,
-                            child: widget.imageUrl == null
+                            child: widget.imageUrl == ''
                                 ? const FaIcon(FontAwesomeIcons.faceGrin,
                                     size: 100, color: Colors.white)
                                 : ClipOval(

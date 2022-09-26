@@ -15,15 +15,16 @@ late User loggedInUser;
 
 class MainMenu extends StatefulWidget {
   static const String id = 'menu_screen';
+  late String? username;
   final String userID;
   final String? imageUrl;
-  final String? username;
-  const MainMenu(
-      {Key? key,
-      required this.userID,
-      required this.imageUrl,
-      required this.username})
-      : super(key: key);
+
+  MainMenu({
+    Key? key,
+    required this.username,
+    required this.userID,
+    required this.imageUrl,
+  }) : super(key: key);
 
   @override
   State<MainMenu> createState() => _MainMenuState();
@@ -46,6 +47,7 @@ class _MainMenuState extends State<MainMenu> {
     } catch (e) {
       print(e);
     }
+    isLoading = false;
   }
 
   signoutUser() {
@@ -55,32 +57,6 @@ class _MainMenuState extends State<MainMenu> {
     } catch (e) {
       print('Signout Failed');
     }
-  }
-
-  getDataAndDeleteExpiredReservation() async {
-    isLoading = true;
-    final docRef = _firestore
-        .collection('user')
-        .doc('reservation')
-        .collection('reservation')
-        .get();
-    await docRef.then(
-      (QuerySnapshot snapshot) {
-        snapshot.docs.forEach(
-          (DocumentSnapshot documentSnapshot) {
-            setState(
-              () {
-                firebaseData = documentSnapshot.data() as Map<String, dynamic>;
-                String bookingStart = firebaseData['bookingStart'];
-                deleteExpiredReservation(bookingStart);
-                isLoading = false;
-              },
-            );
-          },
-        );
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
   }
 
   void deleteReservationOnPressed(String bookingEnd) async {
@@ -101,28 +77,6 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  void deleteExpiredReservation(String bookingStart) async {
-    DateTime expiredDate = DateTime.parse(bookingStart);
-    if (expiredDate.isBefore(DateTime.now()) == true) {
-      final docRef = _firestore
-          .collection('user')
-          .doc('reservation')
-          .collection('reservation')
-          .where('bookingStart', isEqualTo: bookingStart)
-          .get();
-      await docRef.then(
-        (querySnapshot) {
-          querySnapshot.docs.forEach(
-            (doc) {
-              final docRef = doc.reference.delete();
-              print(docRef);
-            },
-          );
-        },
-      );
-    }
-  }
-
   /*  void deleteData(int index) async {
     final docRef = _firestore
         .collection('user')
@@ -138,8 +92,6 @@ class _MainMenuState extends State<MainMenu> {
   void initState() {
     super.initState();
     getCurrentUser();
-
-    getDataAndDeleteExpiredReservation();
   }
 
   @override
@@ -155,19 +107,18 @@ class _MainMenuState extends State<MainMenu> {
               automaticallyImplyLeading: false,
               backgroundColor: kButtonColor,
               leading: CircleAvatar(
-                  backgroundColor: kButtonColor,
-                  radius: 100.0,
-                  child: widget.imageUrl == null
-                      ? const FaIcon(FontAwesomeIcons.faceGrin,
-                          size: 100, color: Colors.white)
-                      : ClipOval(
-                          child: Image.network(widget.imageUrl!,
-                              height: 50, width: 50, fit: BoxFit.cover),
-                        )),
+                backgroundColor: kButtonColor,
+                radius: 100.0,
+                child: widget.imageUrl == ''
+                    ? const FaIcon(FontAwesomeIcons.faceGrin,
+                        size: 40, color: Colors.white)
+                    : ClipOval(
+                        child: Image.network(widget.imageUrl!,
+                            height: 50, width: 50, fit: BoxFit.cover),
+                      ),
+              ),
               title: Text(
-                widget.username != null
-                    ? 'Welcome ${widget.username} !'
-                    : 'Welcome ${_auth.currentUser!.displayName}',
+                'Welcome ${widget.username} !',
                 style: kGoogleFonts,
               ),
               actions: [
@@ -288,7 +239,7 @@ class _MainMenuState extends State<MainMenu> {
                                         (BuildContext context, int index) {
                                       return GestureDetector(
                                           // ROUTE TO RESERVATION SCREEN DETAILS
-                                          /*  onTap: () {
+                                          onTap: () {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -303,7 +254,7 @@ class _MainMenuState extends State<MainMenu> {
                                                     )),
                                               ),
                                             );
-                                          }, */
+                                          },
                                           // DELETE FUNCTION
                                           onDoubleTap: () {
                                             print(reservationList[index]

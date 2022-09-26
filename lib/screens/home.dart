@@ -27,11 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _firestore = FirebaseFirestore.instance;
   // authentification
   final _auth = FirebaseAuth.instance;
-  // PROFILE DATA
-  late Map<String, dynamic> fireProfile = {};
-  late String username = fireProfile['username'];
-  late String? phoneNumber = fireProfile['userPhoneNumber'];
-  String? imageUrl = '';
 
   getCurrentUser() {
     try {
@@ -56,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           setState(() {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
-            isLoading = false;
+            username = fireProfile['username'];
           });
         });
       },
@@ -64,20 +59,75 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  late String imageUrl = '';
+
   getProfileImage() async {
-    isLoading = true;
     try {
       final ref = FirebaseStorage.instance
           .ref()
           .child('${loggedInUser.uid}/profilepicture.jpg');
       String url = await ref.getDownloadURL();
-      setState(() {
-        imageUrl = url;
-      });
-      isLoading = false;
+      setState(
+        () {
+          imageUrl = url;
+        },
+      );
     } catch (e) {
       print(e);
     }
+  }
+
+  // PROFILE DATA
+  late Map<String, dynamic> fireProfile = {};
+  late String username = fireProfile['username'];
+  late String? phoneNumber = fireProfile['userPhoneNumber'];
+  late Map<String, dynamic> firebaseData = {};
+
+  void deleteExpiredReservation(String bookingStart) async {
+    DateTime expiredDate = DateTime.parse(bookingStart);
+    if (expiredDate.isBefore(DateTime.now()) == true) {
+      final docRef = _firestore
+          .collection('user')
+          .doc('reservation')
+          .collection('reservation')
+          .where('bookingStart', isEqualTo: bookingStart)
+          .get();
+      await docRef.then(
+        (querySnapshot) {
+          querySnapshot.docs.forEach(
+            (doc) {
+              final docRef = doc.reference.delete();
+              print(docRef);
+            },
+          );
+        },
+      );
+    }
+  }
+
+  getDataAndDeleteExpiredReservation() async {
+    final docRef = _firestore
+        .collection('user')
+        .doc('reservation')
+        .collection('reservation')
+        .get();
+    await docRef.then(
+      (QuerySnapshot snapshot) {
+        snapshot.docs.forEach(
+          (DocumentSnapshot documentSnapshot) {
+            setState(
+              () {
+                firebaseData = documentSnapshot.data() as Map<String, dynamic>;
+                String bookingStart = firebaseData['bookingStart'];
+                deleteExpiredReservation(bookingStart);
+              },
+            );
+          },
+        );
+        isLoading = false;
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
   }
 
   //State class
@@ -123,8 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getCurrentUser();
-    getProfileImage();
     getProfile();
+    getProfileImage();
+    getDataAndDeleteExpiredReservation();
   }
 
   @override

@@ -7,7 +7,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/constants.dart';
-import 'package:collection/collection.dart';
+//import 'package:collection/collection.dart';
 
 // creating our user
 late User loggedInUser;
@@ -77,29 +77,46 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
   }
 
   Future<dynamic> uploadBooking({required BookingService newBooking}) async {
-    await reservation
-        .add(newBooking.toJson())
-        .then((value) => print('Booking added'))
-        .catchError((error) => print('Failed to add booking: $error'));
-    Future.delayed(const Duration(seconds: 1));
-    Alert(
-      context: context,
-      type: AlertType.success,
-      title: "SUCCESS!",
-      desc: "Your reservation has been added.",
-      buttons: [
-        DialogButton(
-          onPressed: () {
-            Navigator.pushNamed(context, HomeScreen.id);
-          },
-          width: 120,
-          child: const Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-        )
-      ],
-    ).show();
+    await reservation.add(newBooking.toJson()).then((value) {
+      Future.delayed(const Duration(seconds: 1));
+      Alert(
+        context: context,
+        type: AlertType.success,
+        title: "SUCCESS!",
+        desc: "Your reservation has been added.",
+        buttons: [
+          DialogButton(
+            onPressed: () {
+              Navigator.pushNamed(context, HomeScreen.id);
+            },
+            width: 120,
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ],
+      ).show();
+    }).catchError((error) {
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: "ERROR!",
+        desc: "Something went wrong! Try again!",
+        buttons: [
+          DialogButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            width: 120,
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ],
+      ).show();
+    });
   }
 
   late List<DateTimeRange> converted = [];
