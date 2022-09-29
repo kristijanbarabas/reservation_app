@@ -179,6 +179,14 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     }
     return dateTimeRangeList;
   } */
+  DateTime now = DateTime.now();
+  late DateTime date = DateTime(now.year, now.month, now.day, 7);
+
+  List<DateTimeRange> generatePauseSlots() {
+    List<DateTimeRange> dateTimeRangeList = [];
+    dateTimeRangeList.add(DateTimeRange(start: date, end: DateTime.now()));
+    return dateTimeRangeList;
+  }
 
   @override
   void initState() {
@@ -222,9 +230,9 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
               loadingWidget: const LinearProgressIndicator(),
               uploadingWidget: const LinearProgressIndicator(),
               startingDayOfWeek: StartingDayOfWeek.monday,
-              hideBreakTime: true,
               bookingGridCrossAxisCount: 2,
               disabledDays: const [6, 7],
+              pauseSlots: generatePauseSlots(),
             ),
     );
   }

@@ -15,13 +15,11 @@ late User loggedInUser;
 
 class MainMenu extends StatefulWidget {
   static const String id = 'menu_screen';
-  late String? username;
   final String userID;
   final String? imageUrl;
 
   MainMenu({
     Key? key,
-    required this.username,
     required this.userID,
     required this.imageUrl,
   }) : super(key: key);
@@ -94,6 +92,8 @@ class _MainMenuState extends State<MainMenu> {
     getCurrentUser();
   }
 
+  late Text textWidget;
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -117,10 +117,34 @@ class _MainMenuState extends State<MainMenu> {
                             height: 50, width: 50, fit: BoxFit.cover),
                       ),
               ),
-              title: Text(
-                'Welcome ${widget.username} !',
-                style: kGoogleFonts,
-              ),
+              title: StreamBuilder<QuerySnapshot>(
+                  stream: _firestore
+                      .collection('user')
+                      .doc(loggedInUser.uid)
+                      .collection('profile')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: SpinKitChasingDots(
+                          color: Colors.black,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    } else {
+                      final profile = snapshot.data!.docs;
+                      Map<String, dynamic> profileData = {};
+                      late String username = profileData['username'];
+                      for (var snapshot in profile) {
+                        profileData = snapshot.data() as Map<String, dynamic>;
+                      }
+                      textWidget = Text(
+                        'Welcome $username !',
+                        style: kGoogleFonts,
+                      );
+                    }
+                    return textWidget;
+                  }),
               actions: [
                 GestureDetector(
                   onTap: () {

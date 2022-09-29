@@ -154,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late List<Widget> screens = [
     MainMenu(
-      username: username,
       userID: loggedInUser.uid,
       imageUrl: imageUrl,
     ),

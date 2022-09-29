@@ -144,16 +144,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             // GOOGLE LOGIN BUTTON
             GestureDetector(
-              onTap: () {
-                signInWithGoogle();
-                final docRef = _firestore
-                    .collection('user')
-                    .doc(_auth.currentUser!.uid)
-                    .collection('profile')
-                    .doc(_auth.currentUser!.uid);
+              onTap: () async {
                 try {
+                  signInWithGoogle();
+                  final docRef = _firestore
+                      .collection('user')
+                      .doc(_auth.currentUser!.uid)
+                      .collection('profile')
+                      .doc(_auth.currentUser!.uid);
                   if (_auth.currentUser!.uid != null) {
-                    docRef.get().then((DocumentSnapshot document) {
+                    await docRef.get().then((DocumentSnapshot document) {
                       if (document.exists) {
                         // DO NOTHING
                       } else {
