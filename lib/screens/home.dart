@@ -48,12 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
         .get();
     await docRef.then(
       (QuerySnapshot snapshot) {
-        snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+        for (var documentSnapshot in snapshot.docs) {
           setState(() {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
             username = fireProfile['username'];
           });
-        });
+        }
       },
       onError: (e) => print("Error getting document: $e"),
     );
@@ -94,12 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
           .get();
       await docRef.then(
         (querySnapshot) {
-          querySnapshot.docs.forEach(
-            (doc) {
-              final docRef = doc.reference.delete();
-              print(docRef);
-            },
-          );
+          for (var doc in querySnapshot.docs) {
+            final docRef = doc.reference.delete();
+            print(docRef);
+          }
         },
       );
     }
@@ -113,17 +111,15 @@ class _HomeScreenState extends State<HomeScreen> {
         .get();
     await docRef.then(
       (QuerySnapshot snapshot) {
-        snapshot.docs.forEach(
-          (DocumentSnapshot documentSnapshot) {
-            setState(
-              () {
-                firebaseData = documentSnapshot.data() as Map<String, dynamic>;
-                String bookingStart = firebaseData['bookingStart'];
-                deleteExpiredReservation(bookingStart);
-              },
-            );
-          },
-        );
+        for (var documentSnapshot in snapshot.docs) {
+          setState(
+            () {
+              firebaseData = documentSnapshot.data() as Map<String, dynamic>;
+              String bookingStart = firebaseData['bookingStart'];
+              deleteExpiredReservation(bookingStart);
+            },
+          );
+        }
         isLoading = false;
       },
       onError: (e) => print("Error getting document: $e"),
@@ -162,9 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
       imageUrl: imageUrl,
       email: loggedInUser.email!,
       username: username,
-      phoneNumber: loggedInUser.phoneNumber == null
-          ? phoneNumber
-          : loggedInUser.phoneNumber,
+      phoneNumber: loggedInUser.phoneNumber ?? phoneNumber,
     ),
   ];
 

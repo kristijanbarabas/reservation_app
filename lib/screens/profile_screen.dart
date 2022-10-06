@@ -10,7 +10,7 @@ import 'package:reservation_app/components/text_field_widget.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:reservation_app/services/database_service.dart';
+import 'package:reservation_app/services/user_database.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
@@ -37,7 +37,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final CloudStorage storage = CloudStorage();
-  final DatabaseService deleteService = DatabaseService();
+  final UserDatabase deleteService = UserDatabase();
 // authentification
   final _auth = FirebaseAuth.instance;
   getCurrentUser() {

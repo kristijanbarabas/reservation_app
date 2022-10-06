@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/screens/home.dart';
+import 'package:reservation_app/screens/test.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
@@ -122,7 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   final existingUser = await _auth.signInWithEmailAndPassword(
                       email: email, password: password);
                   if (existingUser != null) {
-                    Navigator.pushNamed(context, HomeScreen.id);
+                    //Navigator.pushNamed(context, HomeScreen.id);
+                    Navigator.pushNamed(context, Test.id);
                   }
                 } catch (e) {
                   Alert(context: context, title: "Error", desc: "Try again!")
