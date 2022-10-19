@@ -8,6 +8,7 @@ import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:reservation_app/components/loading_widget.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -15,13 +16,13 @@ late User loggedInUser;
 
 class MainMenu extends StatefulWidget {
   static const String id = 'menu_screen';
-  final String userID;
-  final String? imageUrl;
+  //final String userID;
+  final String? profilePicture;
 
-  MainMenu({
+  const MainMenu({
     Key? key,
-    required this.userID,
-    required this.imageUrl,
+    //required this.userID,
+    required this.profilePicture,
   }) : super(key: key);
 
   @override
@@ -29,18 +30,32 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
+  // LOADING BOOL
   bool isLoading = true;
-
+  // FIREBASE DATA
   late Map<String, dynamic> firebaseData = {};
-
-  // authentification
+  // AUTHENTIFICATION
   final _auth = FirebaseAuth.instance;
+  // STREAM
+  late Stream<QuerySnapshot<Object?>>? profileStream = _firestore
+      .collection('user')
+      .doc(loggedInUser.uid)
+      .collection('profile')
+      .snapshots();
+  late Stream<QuerySnapshot<Object?>>? reservationStream = _firestore
+      .collection('user')
+      .doc('reservation')
+      .collection('reservation')
+      .where('userId', isEqualTo: loggedInUser.uid)
+      .snapshots();
 
   getCurrentUser() {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        loggedInUser = user;
+        setState(() {
+          loggedInUser = user;
+        });
       }
     } catch (e) {
       print(e);
@@ -48,9 +63,9 @@ class _MainMenuState extends State<MainMenu> {
     isLoading = false;
   }
 
-  signoutUser() {
+  signoutUser() async {
     try {
-      _auth.signOut();
+      await _auth.signOut();
       print('Signout Succesfull');
     } catch (e) {
       print('Signout Failed');
@@ -97,10 +112,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const SpinKitChasingDots(
-            color: Colors.black,
-            duration: Duration(seconds: 3),
-          )
+        ? const LoadingWidget()
         : Scaffold(
             backgroundColor: kBackgroundColor,
             appBar: AppBar(
@@ -109,28 +121,19 @@ class _MainMenuState extends State<MainMenu> {
               leading: CircleAvatar(
                 backgroundColor: kButtonColor,
                 radius: 100.0,
-                child: widget.imageUrl == ''
+                child: widget.profilePicture == null
                     ? const FaIcon(FontAwesomeIcons.faceGrin,
                         size: 40, color: Colors.white)
                     : ClipOval(
-                        child: Image.network(widget.imageUrl!,
+                        child: Image.network(widget.profilePicture!,
                             height: 50, width: 50, fit: BoxFit.cover),
                       ),
               ),
               title: StreamBuilder<QuerySnapshot>(
-                  stream: _firestore
-                      .collection('user')
-                      .doc(loggedInUser.uid)
-                      .collection('profile')
-                      .snapshots(),
+                  stream: profileStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const Center(
-                        child: SpinKitChasingDots(
-                          color: Colors.black,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
+                      return const Text('');
                     } else {
                       final profile = snapshot.data!.docs;
                       Map<String, dynamic> profileData = {};
@@ -208,20 +211,10 @@ class _MainMenuState extends State<MainMenu> {
                           border: Border.all(color: Colors.white),
                           borderRadius: BorderRadius.circular(10.0)),
                       child: StreamBuilder<QuerySnapshot>(
-                          stream: _firestore
-                              .collection('user')
-                              .doc('reservation')
-                              .collection('reservation')
-                              .where('userId', isEqualTo: loggedInUser.uid)
-                              .snapshots(),
+                          stream: reservationStream,
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
-                              return const Center(
-                                child: SpinKitChasingDots(
-                                  color: Colors.black,
-                                  duration: Duration(seconds: 3),
-                                ),
-                              );
+                              return const Text('');
                             } else {
                               final reservation = snapshot.data!.docs;
 
@@ -280,10 +273,7 @@ class _MainMenuState extends State<MainMenu> {
                                             );
                                           },
                                           // DELETE FUNCTION
-                                          onDoubleTap: () {
-                                            print(reservationList[index]
-                                                .reservationEnd);
-                                          },
+
                                           onLongPress: () {
                                             Alert(
                                               context: context,

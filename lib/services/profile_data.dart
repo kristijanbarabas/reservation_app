@@ -10,7 +10,7 @@ late User loggedInUser;
 
 class ProfileData {
   Future<String> getUserData() {
-    return Future.delayed(Duration(seconds: 3), () {
+    return Future.delayed(const Duration(seconds: 3), () {
       return "Kiki";
     });
   }

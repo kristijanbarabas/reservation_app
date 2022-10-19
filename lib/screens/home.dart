@@ -1,19 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:reservation_app/components/loading_widget.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/profile_screen.dart';
 
 import '../components/booking_calendar.dart';
 
+// creating our user
+late User loggedInUser;
+
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,18 +26,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
-  // creating our user
-  late User loggedInUser;
+
   //firestore instance
   final _firestore = FirebaseFirestore.instance;
   // authentification
   final _auth = FirebaseAuth.instance;
 
+  // PROFILE DATA
+  late Map<String, dynamic> firebaseData = {};
+  late Map<String, dynamic> fireProfile = {};
+  late String? profilePicture;
+  late String? username;
+  late String? phoneNumber = fireProfile['userPhoneNumber'];
+
   getCurrentUser() {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        loggedInUser = user;
+        setState(() {
+          loggedInUser = user;
+        });
       }
     } catch (e) {
       print(e);
@@ -40,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getProfile() async {
-    isLoading = true;
     final docRef = _firestore
         .collection('user')
         .doc(loggedInUser.uid)
@@ -51,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         for (var documentSnapshot in snapshot.docs) {
           setState(() {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
+            profilePicture = fireProfile['userProfilePicture'];
             username = fireProfile['username'];
           });
         }
@@ -59,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  late String imageUrl = '';
+  /* late String imageUrl = '';
 
   getProfileImage() async {
     try {
@@ -75,13 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
-  }
-
-  // PROFILE DATA
-  late Map<String, dynamic> fireProfile = {};
-  late String username = fireProfile['username'];
-  late String? phoneNumber = fireProfile['userPhoneNumber'];
-  late Map<String, dynamic> firebaseData = {};
+  } */
 
   void deleteExpiredReservation(String bookingStart) async {
     DateTime expiredDate = DateTime.parse(bookingStart);
@@ -95,8 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await docRef.then(
         (querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            final docRef = doc.reference.delete();
-            print(docRef);
+            doc.reference.delete();
           }
         },
       );
@@ -109,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .doc('reservation')
         .collection('reservation')
         .get();
+
     await docRef.then(
       (QuerySnapshot snapshot) {
         for (var documentSnapshot in snapshot.docs) {
@@ -117,10 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
               firebaseData = documentSnapshot.data() as Map<String, dynamic>;
               String bookingStart = firebaseData['bookingStart'];
               deleteExpiredReservation(bookingStart);
+              isLoading = false;
             },
           );
         }
-        isLoading = false;
       },
       onError: (e) => print("Error getting document: $e"),
     );
@@ -150,12 +157,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late List<Widget> screens = [
     MainMenu(
-      userID: loggedInUser.uid,
-      imageUrl: imageUrl,
+      profilePicture: profilePicture,
     ),
     const CustomBookingCalendar(),
     ProfileScreen(
-      imageUrl: imageUrl,
+      profilePicture: profilePicture,
       email: loggedInUser.email!,
       username: username,
       phoneNumber: loggedInUser.phoneNumber ?? phoneNumber,
@@ -167,17 +173,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getCurrentUser();
     getProfile();
-    getProfileImage();
     getDataAndDeleteExpiredReservation();
   }
 
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const SpinKitChasingDots(
-            color: Colors.black,
-            duration: Duration(seconds: 3),
-          )
+        ? const LoadingWidget()
         : Scaffold(
             backgroundColor: kBackgroundColor,
             body: screens[_pageIndex],

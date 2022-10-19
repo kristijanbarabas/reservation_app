@@ -8,8 +8,12 @@ import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:reservation_app/components/google_sign_in.dart';
 
+// firebase auth
+final _auth = FirebaseAuth.instance;
+// creating our user
+late User loggedInUser;
 //firestore instance
 final _firestore = FirebaseFirestore.instance;
 
@@ -44,8 +48,92 @@ class _LoginScreenState extends State<LoginScreen> {
   late String email;
   late String password;
   late String userID;
-  // firebase auth
-  final _auth = FirebaseAuth.instance;
+
+  // profile data
+  late String? profilePicture;
+  late String? username;
+
+  getCurrentUser() {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  getProfile() async {
+    final docRef = _firestore
+        .collection('user')
+        .doc(loggedInUser.uid)
+        .collection('profile')
+        .get();
+    await docRef.then(
+      (QuerySnapshot snapshot) {
+        for (var documentSnapshot in snapshot.docs) {
+          setState(() {
+            fireProfile = documentSnapshot.data() as Map<String, dynamic>;
+            profilePicture = fireProfile['userProfilePicture'];
+            username = fireProfile['username'];
+          });
+        }
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+  }
+
+  // PROFILE DATA
+  late Map<String, dynamic> firebaseData = {};
+  late Map<String, dynamic> fireProfile = {};
+  late String? phoneNumber = fireProfile['userPhoneNumber'];
+
+  // button radius
+  double buttonRadius = 35.0;
+
+  //
+  void customSignInWithGoogle() async {
+    try {
+      await signInWithGoogle();
+      if (_auth.currentUser?.uid != null) {
+        final docRef = _firestore
+            .collection('user')
+            .doc(_auth.currentUser?.uid)
+            .collection('profile')
+            .doc(_auth.currentUser?.uid);
+        await docRef.get().then(
+          (DocumentSnapshot document) {
+            if (document.exists) {
+              // DO NOTHING
+            } else {
+              docRef.set(
+                {
+                  'username': _auth.currentUser?.displayName,
+                  'phoneNumber': _auth.currentUser?.phoneNumber
+                },
+              );
+            }
+            Navigator.pushNamed(context, HomeScreen.id);
+          },
+        );
+      }
+    } catch (e) {
+      Alert(context: context, title: "Error", desc: "Try again!").show();
+    }
+  }
+
+  void customSignInWithEmailAndPassword() async {
+    try {
+      final existingUser = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      if (existingUser != null) {
+        Navigator.pushNamed(context, HomeScreen.id);
+      }
+    } catch (e) {
+      Alert(context: context, title: "Error", desc: "Try again!").show();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +168,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
             const SizedBox(
               height: 54.0,
             ),
@@ -111,26 +198,13 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 24.0,
             ),
-
             // LOGIN BUTTON
-            RoundedButton(
+            CustomRoundedButton(
               iconData: Icons.login,
               textStyle: kGoogleFonts,
               color: kButtonColor,
               title: kLoginTitle,
-              onPressed: () async {
-                try {
-                  final existingUser = await _auth.signInWithEmailAndPassword(
-                      email: email, password: password);
-                  if (existingUser != null) {
-                    //Navigator.pushNamed(context, HomeScreen.id);
-                    Navigator.pushNamed(context, Test.id);
-                  }
-                } catch (e) {
-                  Alert(context: context, title: "Error", desc: "Try again!")
-                      .show();
-                }
-              },
+              onPressed: customSignInWithEmailAndPassword,
             ),
             const SizedBox(
               height: 24.0,
@@ -145,52 +219,8 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8,
             ),
             // GOOGLE LOGIN BUTTON
-            GestureDetector(
-              onTap: () async {
-                try {
-                  signInWithGoogle();
-                  final docRef = _firestore
-                      .collection('user')
-                      .doc(_auth.currentUser!.uid)
-                      .collection('profile')
-                      .doc(_auth.currentUser!.uid);
-                  if (_auth.currentUser!.uid != null) {
-                    await docRef.get().then((DocumentSnapshot document) {
-                      if (document.exists) {
-                        // DO NOTHING
-                      } else {
-                        docRef.set({
-                          'username': _auth.currentUser!.displayName,
-                          'phoneNumber': _auth.currentUser!.phoneNumber
-                        });
-                      }
-                    });
-                    Navigator.pushNamed(context, HomeScreen.id);
-                  }
-                } catch (e) {
-                  Alert(context: context, title: "Error", desc: "Try again!")
-                      .show();
-                }
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 5,
-                        color: Color.fromARGB(255, 36, 36, 36),
-                        spreadRadius: 0.1)
-                  ],
-                ),
-                child: const CircleAvatar(
-                  radius: 35,
-                  backgroundColor: kButtonColor,
-                  child: FaIcon(
-                    FontAwesomeIcons.google,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            CustomGoogleSignInButton(
+              function: customSignInWithGoogle,
             ),
           ],
         ),

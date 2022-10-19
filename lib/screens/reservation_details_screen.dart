@@ -32,7 +32,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
         .get();
     await docRef.then(
       (QuerySnapshot snapshot) {
-        final data = snapshot.docs[index].reference.delete();
+        snapshot.docs[index].reference.delete();
       },
       onError: (e) => print("Error getting document: $e"),
     );

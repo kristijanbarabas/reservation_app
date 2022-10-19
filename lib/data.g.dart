@@ -14,7 +14,6 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
       bookingEnd: Data.timeStampToDateTime(json['bookingEnd'] as Timestamp),
       placeId: json['placeId'] as String?,
       userId: json['userId'] as String?,
-      userName: json['userName'] as String?,
       serviceName: json['serviceName'] as String?,
       serviceDuration: json['serviceDuration'] as int?,
       servicePrice: json['servicePrice'] as int?,
@@ -22,7 +21,6 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
       'userId': instance.userId,
-      'userName': instance.userName,
       'placeId': instance.placeId,
       'serviceName': instance.serviceName,
       'serviceDuration': instance.serviceDuration,

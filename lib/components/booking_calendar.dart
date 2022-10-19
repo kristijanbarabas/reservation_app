@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/data.dart';
 import 'package:reservation_app/screens/home.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -20,7 +22,7 @@ CollectionReference reservation =
     _firestore.collection('user').doc('reservation').collection('reservation');
 
 class CustomBookingCalendar extends StatefulWidget {
-  static const String id = 'custom_bottom_sheet';
+  static const String id = 'custom_booking_calendar';
   const CustomBookingCalendar({
     Key? key,
   }) : super(key: key);
@@ -68,7 +70,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
-  Stream<dynamic>? getBookingStreamFirebase(
+  Stream<dynamic> getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
     return getBookingStream(placeId: 'reservation')
         .where('bookingStart', isGreaterThanOrEqualTo: start)
@@ -87,7 +89,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
         buttons: [
           DialogButton(
             onPressed: () {
-              Navigator.pushNamed(context, HomeScreen.id);
+              Navigator.pop(context);
             },
             width: 120,
             child: const Text(
@@ -235,5 +237,10 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
               pauseSlots: generatePauseSlots(),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

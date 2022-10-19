@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -21,14 +22,14 @@ class ProfileScreen extends StatefulWidget {
   late String? username;
   late String? phoneNumber;
   final String email;
-  final String? imageUrl;
+  final String? profilePicture;
 
   ProfileScreen(
       {Key? key,
       required this.username,
       required this.email,
       required this.phoneNumber,
-      required this.imageUrl})
+      required this.profilePicture})
       : super(key: key);
 
   @override
@@ -75,6 +76,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await storage.uploadFile(image.path, loggedInUser.uid).then(
             (value) => print('Done'),
           );
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('${loggedInUser.uid}/profilepicture.jpg');
+      String url = await ref.getDownloadURL();
+      final docRef = _firestore
+          .collection('user')
+          .doc(loggedInUser.uid)
+          .collection('profile')
+          .doc(loggedInUser.uid);
+      await docRef.set({'userProfilePicture': url}, SetOptions(merge: true));
     } catch (e) {
       print(e);
     }
@@ -86,7 +97,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     getCurrentUser();
   }
 
-  deleteUserProfile() async {
+  deleteUser() {
+    loggedInUser.delete();
+  }
+
+  deleteUserProfile() {
     _firestore
         .collection("user")
         .doc(loggedInUser.uid)
@@ -130,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   deleteUserProfile();
                   deleteUserReservations();
-                  loggedInUser.delete();
+                  deleteUser();
                   Navigator.pushNamed(context, WelcomeScreen.id);
                 },
                 color: kButtonColor,
@@ -164,6 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               showModalBottomSheet(
                 context: context,
                 builder: (BuildContext context) {
+                  // TODO: EXTRACT INTO WIDGET
                   return Container(
                     color: kModalSheetRadiusColor,
                     child: Container(
@@ -219,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 widget.phoneNumber = value!;
                               },
                             ),
-                            RoundedButton(
+                            CustomRoundedButton(
                                 color: kButtonColor,
                                 title: kSubmit,
                                 onPressed: () {
@@ -252,12 +268,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const Center(
-                child: SpinKitChasingDots(
-                  color: Colors.black,
-                  duration: Duration(seconds: 3),
-                ),
-              );
+              return const Text('');
             } else {
               final profile = snapshot.data!.docs;
               Map<String, dynamic> profileData = {};
@@ -277,11 +288,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                             backgroundColor: kButtonColor,
                             radius: 100.0,
-                            child: widget.imageUrl == ''
+                            child: widget.profilePicture == null
                                 ? const FaIcon(FontAwesomeIcons.faceGrin,
                                     size: 100, color: Colors.white)
                                 : ClipOval(
-                                    child: Image.network(widget.imageUrl!,
+                                    child: Image.network(widget.profilePicture!,
                                         height: 200,
                                         width: 200,
                                         fit: BoxFit.cover),

@@ -111,7 +111,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     hintText: 'Enter your username...')),
 
             // REGISTER BUTTON
-            RoundedButton(
+            CustomRoundedButton(
               iconData: Icons.app_registration_rounded,
               textStyle: kGoogleFonts,
               color: kButtonColor,

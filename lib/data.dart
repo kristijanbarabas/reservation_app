@@ -14,7 +14,6 @@ class Data {
 
   /// The generated code assumes these values exist in JSON.
   final String? userId;
-  final String? userName;
   final String? placeId;
   final String? serviceName;
   final int? serviceDuration;
@@ -44,7 +43,6 @@ class Data {
       this.bookingEnd,
       this.placeId,
       this.userId,
-      this.userName,
       this.serviceName,
       this.serviceDuration,
       this.servicePrice});
