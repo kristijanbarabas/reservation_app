@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
@@ -252,7 +251,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               );
             },
-            child: const Icon(Icons.edit),
+            child: const Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.edit),
+            ),
           ),
         ],
         title: Text(
@@ -274,6 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Map<String, dynamic> profileData = {};
               late String username = profileData['username'];
               late String phoneNumber = profileData['userPhoneNumber'];
+              late String? profilePicture = profileData['userProfilePicture'];
               for (var snapshot in profile) {
                 profileData = snapshot.data() as Map<String, dynamic>;
               }
@@ -286,17 +289,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Stack(
                       children: [
                         CircleAvatar(
-                            backgroundColor: kButtonColor,
-                            radius: 100.0,
-                            child: widget.profilePicture == null
-                                ? const FaIcon(FontAwesomeIcons.faceGrin,
-                                    size: 100, color: Colors.white)
-                                : ClipOval(
-                                    child: Image.network(widget.profilePicture!,
-                                        height: 200,
-                                        width: 200,
-                                        fit: BoxFit.cover),
-                                  )),
+                          backgroundColor: kButtonColor,
+                          radius: 100.0,
+                          child: profilePicture == null
+                              ? const FaIcon(FontAwesomeIcons.faceGrin,
+                                  size: 100, color: Colors.white)
+                              : ClipOval(
+                                  child: Image.network(profilePicture,
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover),
+                                ),
+                        ),
                         Positioned(
                           bottom: 0,
                           right: 0,

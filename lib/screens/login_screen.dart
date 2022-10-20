@@ -110,7 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
               docRef.set(
                 {
                   'username': _auth.currentUser?.displayName,
-                  'phoneNumber': _auth.currentUser?.phoneNumber
+                  'phoneNumber': _auth.currentUser?.phoneNumber,
+                  'userProfilePicture': _auth.currentUser?.photoURL,
                 },
               );
             }

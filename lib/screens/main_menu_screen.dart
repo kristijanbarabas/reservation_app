@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:reservation_app/components/empty_placeholder_widget.dart';
 import 'package:reservation_app/components/reservation_details.dart';
 import 'package:reservation_app/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
@@ -16,13 +16,10 @@ late User loggedInUser;
 
 class MainMenu extends StatefulWidget {
   static const String id = 'menu_screen';
-  //final String userID;
-  final String? profilePicture;
 
   const MainMenu({
     Key? key,
     //required this.userID,
-    required this.profilePicture,
   }) : super(key: key);
 
   @override
@@ -108,6 +105,7 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   late Text textWidget;
+  late Widget profilePictureWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -121,19 +119,36 @@ class _MainMenuState extends State<MainMenu> {
               leading: CircleAvatar(
                 backgroundColor: kButtonColor,
                 radius: 100.0,
-                child: widget.profilePicture == null
-                    ? const FaIcon(FontAwesomeIcons.faceGrin,
-                        size: 40, color: Colors.white)
-                    : ClipOval(
-                        child: Image.network(widget.profilePicture!,
-                            height: 50, width: 50, fit: BoxFit.cover),
-                      ),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: profileStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const EmptyPlaceholderWidget();
+                      } else {
+                        final profile = snapshot.data!.docs;
+                        Map<String, dynamic> profileData = {};
+                        late String? profilePicture =
+                            profileData['userProfilePicture'];
+                        for (var snapshot in profile) {
+                          profileData = snapshot.data() as Map<String, dynamic>;
+                        }
+                        profilePicture == null
+                            ? profilePictureWidget = const FaIcon(
+                                FontAwesomeIcons.faceGrin,
+                                size: 40,
+                                color: Colors.white)
+                            : profilePictureWidget = ClipOval(
+                                child: Image.network(profilePicture,
+                                    height: 50, width: 50, fit: BoxFit.cover));
+                      }
+                      return profilePictureWidget;
+                    }),
               ),
               title: StreamBuilder<QuerySnapshot>(
                   stream: profileStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const Text('');
+                      return const EmptyPlaceholderWidget();
                     } else {
                       final profile = snapshot.data!.docs;
                       Map<String, dynamic> profileData = {};

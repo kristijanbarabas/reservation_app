@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reservation_app/components/loading_widget.dart';
 import 'package:reservation_app/constants.dart';
@@ -35,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // PROFILE DATA
   late Map<String, dynamic> firebaseData = {};
   late Map<String, dynamic> fireProfile = {};
-  late String? profilePicture;
+  late String? profilePicture = fireProfile['userProfilePicture'];
   late String? username;
   late String? phoneNumber = fireProfile['userPhoneNumber'];
 
@@ -65,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
             profilePicture = fireProfile['userProfilePicture'];
             username = fireProfile['username'];
+            isLoading = false;
           });
         }
       },
@@ -124,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
               firebaseData = documentSnapshot.data() as Map<String, dynamic>;
               String bookingStart = firebaseData['bookingStart'];
               deleteExpiredReservation(bookingStart);
-              isLoading = false;
             },
           );
         }
@@ -156,9 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   late List<Widget> screens = [
-    MainMenu(
-      profilePicture: profilePicture,
-    ),
+    const MainMenu(),
     const CustomBookingCalendar(),
     ProfileScreen(
       profilePicture: profilePicture,
