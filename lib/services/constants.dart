@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// HINT TEXT
+const String kHintTextEmail = 'Enter your email...';
+const String kHintTextPassword = 'Enter your password...';
+const String kHintTextUsername = 'Enter your username...';
+
 // BUTTON FONT AND STYLE
 final TextStyle kGoogleFonts = GoogleFonts.rancho(
   textStyle: const TextStyle(

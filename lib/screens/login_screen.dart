@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/screens/home.dart';
 import 'package:reservation_app/screens/test.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
-import '../components/rounded_button.dart';
-import '../constants.dart';
+import '../custom_widgets/rounded_button.dart';
+import '../services/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reservation_app/components/google_sign_in.dart';
+import 'package:reservation_app/custom_widgets/google_sign_in.dart';
 
 // firebase auth
 final _auth = FirebaseAuth.instance;
@@ -50,6 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
   late String userID;
 
   // profile data
+  late Map<String, dynamic> firebaseData = {};
+  late Map<String, dynamic> fireProfile = {};
+  late String? phoneNumber;
   late String? profilePicture;
   late String? username;
 
@@ -60,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
         loggedInUser = user;
       }
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
 
@@ -77,17 +81,14 @@ class _LoginScreenState extends State<LoginScreen> {
             fireProfile = documentSnapshot.data() as Map<String, dynamic>;
             profilePicture = fireProfile['userProfilePicture'];
             username = fireProfile['username'];
+            phoneNumber = fireProfile['userPhoneNumber'];
           });
         }
       },
-      onError: (e) => print("Error getting document: $e"),
+      onError: (e) =>
+          Alert(context: context, title: "Error", desc: "Try again!").show(),
     );
   }
-
-  // PROFILE DATA
-  late Map<String, dynamic> firebaseData = {};
-  late Map<String, dynamic> fireProfile = {};
-  late String? phoneNumber = fireProfile['userPhoneNumber'];
 
   // button radius
   double buttonRadius = 35.0;
@@ -95,6 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
   //
   void customSignInWithGoogle() async {
     try {
+      showDialog(
+        context: context,
+        builder: (context) => const CustomLoadingWidget(),
+      );
       await signInWithGoogle();
       if (_auth.currentUser?.uid != null) {
         final docRef = _firestore
@@ -115,6 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               );
             }
+            Navigator.pop(context);
             Navigator.pushNamed(context, HomeScreen.id);
           },
         );
@@ -151,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: kGoogleFonts,
         ),
         centerTitle: true,
-        backgroundColor: kBackgroundColor,
+        backgroundColor: kButtonColor,
       ),
       backgroundColor: kBackgroundColor,
       body: Padding(
@@ -165,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 tag: 'logo',
                 child: SizedBox(
                   height: 100,
-                  child: Image.asset('images/logo.png'),
+                  child: Image.asset('assets/logo.png'),
                 ),
               ),
             ),
@@ -180,8 +186,8 @@ class _LoginScreenState extends State<LoginScreen> {
               onChanged: (value) {
                 email = value;
               },
-              decoration: kTextFieldDecoration.copyWith(
-                  hintText: 'Enter your email...'),
+              decoration:
+                  kTextFieldDecoration.copyWith(hintText: kHintTextEmail),
             ),
             const SizedBox(
               height: 8.0,
@@ -194,8 +200,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 onChanged: (value) {
                   password = value;
                 },
-                decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your password...')),
+                decoration:
+                    kTextFieldDecoration.copyWith(hintText: kHintTextPassword)),
             const SizedBox(
               height: 24.0,
             ),
@@ -203,7 +209,6 @@ class _LoginScreenState extends State<LoginScreen> {
             CustomRoundedButton(
               iconData: Icons.login,
               textStyle: kGoogleFonts,
-              color: kButtonColor,
               title: kLoginTitle,
               onPressed: customSignInWithEmailAndPassword,
             ),

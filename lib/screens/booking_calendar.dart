@@ -3,12 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/data.dart';
 import 'package:reservation_app/screens/home.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
-import 'package:reservation_app/constants.dart';
+import 'package:reservation_app/services/constants.dart';
 //import 'package:collection/collection.dart';
 
 // creating our user
@@ -80,7 +81,6 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
 
   Future<dynamic> uploadBooking({required BookingService newBooking}) async {
     await reservation.add(newBooking.toJson()).then((value) {
-      Future.delayed(const Duration(seconds: 1));
       Alert(
         context: context,
         type: AlertType.success,
@@ -181,12 +181,17 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     }
     return dateTimeRangeList;
   } */
+
   DateTime now = DateTime.now();
-  late DateTime date = DateTime(now.year, now.month, now.day, 7);
+  late DateTime startDate = DateTime(now.year, now.month, now.day, 8);
 
   List<DateTimeRange> generatePauseSlots() {
     List<DateTimeRange> dateTimeRangeList = [];
-    dateTimeRangeList.add(DateTimeRange(start: date, end: DateTime.now()));
+    if (startDate.weekday != DateTime.saturday &&
+        startDate.weekday != DateTime.sunday) {
+      dateTimeRangeList
+          .add(DateTimeRange(start: startDate, end: DateTime.now()));
+    }
     return dateTimeRangeList;
   }
 
@@ -229,8 +234,8 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
               convertStreamResultToDateTimeRanges: convertStreamResult,
               bookingButtonText: 'SUBMIT',
               bookingButtonColor: kButtonColor,
-              loadingWidget: const LinearProgressIndicator(),
-              uploadingWidget: const LinearProgressIndicator(),
+              loadingWidget: const CustomLoadingWidget(),
+              uploadingWidget: const CustomLoadingWidget(),
               startingDayOfWeek: StartingDayOfWeek.monday,
               bookingGridCrossAxisCount: 2,
               disabledDays: const [6, 7],

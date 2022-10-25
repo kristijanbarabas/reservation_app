@@ -1,17 +1,21 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:reservation_app/services/cloud_storage.dart';
-import 'package:reservation_app/components/rounded_button.dart';
-import 'package:reservation_app/components/text_field_widget.dart';
-import 'package:reservation_app/constants.dart';
+import 'package:reservation_app/custom_widgets/rounded_button.dart';
+import 'package:reservation_app/custom_widgets/text_form_field_widget.dart';
+import 'package:reservation_app/services/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reservation_app/services/user_database.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import '../custom_widgets/profile_picture_widget.dart';
 
 final _firestore = FirebaseFirestore.instance;
 late User loggedInUser;
@@ -218,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
-                            TextFieldWidget(
+                            CustomTextFormFieldWidget(
                               initialValue: widget.username == null
                                   ? 'Add a username...'
                                   : widget.username!,
@@ -226,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 widget.username = value!;
                               },
                             ),
-                            TextFieldWidget(
+                            CustomTextFormFieldWidget(
                               initialValue: widget.phoneNumber == null
                                   ? 'Add a phone number...'
                                   : widget.phoneNumber!,
@@ -235,7 +239,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               },
                             ),
                             CustomRoundedButton(
-                                color: kButtonColor,
                                 title: kSubmit,
                                 onPressed: () {
                                   updateProfile();
@@ -280,6 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               for (var snapshot in profile) {
                 profileData = snapshot.data() as Map<String, dynamic>;
               }
+              // TODO: EXTRACT INTO WIDGET
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
@@ -294,11 +298,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: profilePicture == null
                               ? const FaIcon(FontAwesomeIcons.faceGrin,
                                   size: 100, color: Colors.white)
-                              : ClipOval(
-                                  child: Image.network(profilePicture,
-                                      height: 200,
-                                      width: 200,
-                                      fit: BoxFit.cover),
+                              : ProfilePictureWidget(
+                                  profilePicture: profilePicture,
+                                  imageHeight: 200,
+                                  imageWidth: 200,
                                 ),
                         ),
                         Positioned(
@@ -312,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 title: "PICK AN IMAGE!",
                                 buttons: [
                                   DialogButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       pickImage(ImageSource.gallery);
                                       Navigator.pop(context);
                                     },
@@ -324,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   DialogButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       pickImage(ImageSource.camera);
                                       Navigator.pop(context);
                                     },

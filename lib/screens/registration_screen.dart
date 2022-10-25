@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:reservation_app/screens/home.dart';
-import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import '../components/rounded_button.dart';
-import '../constants.dart';
+import '../custom_widgets/rounded_button.dart';
+import '../services/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'welcome_screen.dart';
 
@@ -62,9 +61,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             Flexible(
               child: Hero(
                 tag: 'logo',
-                child: Container(
+                child: SizedBox(
                   height: 100,
-                  child: Image.asset('images/logo.png'),
+                  child: Image.asset('assets/logo.png'),
                 ),
               ),
             ),
@@ -78,10 +77,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               textAlign: TextAlign.center,
               onChanged: (value) {
                 email = value;
-                //Do something with the user input.
               },
-              decoration: kTextFieldDecoration.copyWith(
-                  hintText: 'Enter your email...'),
+              decoration:
+                  kTextFieldDecoration.copyWith(hintText: kHintTextEmail),
             ),
             const SizedBox(
               height: 8.0,
@@ -93,10 +91,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 onChanged: (value) {
                   password = value;
-                  //Do something with the user input.
                 },
-                decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your password...')),
+                decoration:
+                    kTextFieldDecoration.copyWith(hintText: kHintTextPassword)),
             const SizedBox(
               height: 8.0,
             ),
@@ -105,16 +102,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
                 onChanged: (value) {
                   username = value;
-                  //Do something with the user input.
                 },
-                decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your username...')),
+                decoration:
+                    kTextFieldDecoration.copyWith(hintText: kHintTextUsername)),
 
             // REGISTER BUTTON
             CustomRoundedButton(
-              iconData: Icons.app_registration_rounded,
               textStyle: kGoogleFonts,
-              color: kButtonColor,
+              iconData: Icons.app_registration_rounded,
               title: kRegisterTitle,
               onPressed: () async {
                 try {
@@ -127,10 +122,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         .doc(newUser.user!.uid)
                         .collection('profile')
                         .doc(newUser.user!.uid)
-                        .set({
-                      'username': username,
-                      'userPhoneNumber': 'Add phone number...',
-                    });
+                        .set(
+                      {
+                        'username': username,
+                        'userPhoneNumber': 'Add phone number...',
+                      },
+                    );
                     Navigator.pushNamed(context, HomeScreen.id);
                   }
                 } catch (e) {

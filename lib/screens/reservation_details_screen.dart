@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reservation_app/constants.dart';
+import 'package:reservation_app/services/constants.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';

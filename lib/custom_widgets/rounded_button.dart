@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:reservation_app/services/constants.dart';
 
 class CustomRoundedButton extends StatelessWidget {
   const CustomRoundedButton(
       {Key? key,
-      required this.color,
       required this.title,
       required this.onPressed,
-      required this.textStyle,
-      required this.iconData})
+      required this.iconData,
+      required this.textStyle})
       : super(key: key);
   final TextStyle textStyle;
-  final Color color;
   final String title;
   final VoidCallback onPressed;
   final IconData iconData;
@@ -21,7 +20,7 @@ class CustomRoundedButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Material(
         elevation: 5.0,
-        color: color,
+        color: kButtonColor,
         borderRadius: BorderRadius.circular(30.0),
         child: MaterialButton(
           onPressed: onPressed,

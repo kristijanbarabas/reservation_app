@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:reservation_app/components/rounded_button.dart';
-import 'package:reservation_app/constants.dart';
+import 'package:reservation_app/custom_widgets/rounded_button.dart';
+import 'package:reservation_app/services/constants.dart';
 import 'package:reservation_app/screens/login_screen.dart';
 import 'package:reservation_app/screens/registration_screen.dart';
 
@@ -24,29 +24,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Hero(tag: 'logo', child: Image.asset('images/logo.png')),
+            Hero(
+              tag: 'logo',
+              child: Image.asset('assets/logo.png'),
+            ),
             const SizedBox(
               height: 68.0,
             ),
 
             // LOGIN BUTTON
             CustomRoundedButton(
-                iconData: Icons.login,
-                color: kButtonColor,
-                title: kLoginTitle,
                 textStyle: kGoogleFonts,
+                iconData: Icons.login,
+                title: kLoginTitle,
                 onPressed: () {
                   Navigator.pushNamed(context, LoginScreen.id);
                 }),
             // REGISTER BUTTON
             CustomRoundedButton(
-                iconData: Icons.app_registration_rounded,
-                color: kButtonColor,
-                title: kRegisterTitle,
-                textStyle: kGoogleFonts,
-                onPressed: () {
-                  Navigator.pushNamed(context, RegistrationScreen.id);
-                })
+              textStyle: kGoogleFonts,
+              iconData: Icons.app_registration_rounded,
+              title: kRegisterTitle,
+              onPressed: () {
+                Navigator.pushNamed(context, RegistrationScreen.id);
+              },
+            )
           ],
         ),
       ),

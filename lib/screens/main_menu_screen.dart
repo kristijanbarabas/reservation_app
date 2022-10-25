@@ -1,14 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:reservation_app/components/empty_placeholder_widget.dart';
-import 'package:reservation_app/components/reservation_details.dart';
-import 'package:reservation_app/constants.dart';
+import 'package:reservation_app/custom_widgets/empty_placeholder_widget.dart';
+import 'package:reservation_app/custom_widgets/reservation_details.dart';
+import 'package:reservation_app/services/constants.dart';
 import 'package:reservation_app/screens/reservation_details_screen.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:reservation_app/components/loading_widget.dart';
+import 'package:reservation_app/custom_widgets/loading_widget.dart';
+
+import '../custom_widgets/profile_picture_widget.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -110,7 +113,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const LoadingWidget()
+        ? const CustomLoadingWidget()
         : Scaffold(
             backgroundColor: kBackgroundColor,
             appBar: AppBar(
@@ -137,9 +140,11 @@ class _MainMenuState extends State<MainMenu> {
                                 FontAwesomeIcons.faceGrin,
                                 size: 40,
                                 color: Colors.white)
-                            : profilePictureWidget = ClipOval(
-                                child: Image.network(profilePicture,
-                                    height: 50, width: 50, fit: BoxFit.cover));
+                            : profilePictureWidget = ProfilePictureWidget(
+                                profilePicture: profilePicture,
+                                imageHeight: 50,
+                                imageWidth: 50,
+                              );
                       }
                       return profilePictureWidget;
                     }),
