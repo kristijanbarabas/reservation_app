@@ -1,35 +1,32 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reservation_app/services/riverpod.dart';
+import 'package:reservation_app/services/firestore_database.dart';
 
-class Test extends ConsumerWidget {
+class Test extends StatefulWidget {
   static const String id = 'test_screen';
-  const Test({Key? key}) : super(key: key);
+  const Test({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  State<Test> createState() => _TestState();
+}
+
+class _TestState extends State<Test> {
+  StreamController<Stream<QuerySnapshot>> controller = StreamController();
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Consumer(builder: (context, ref, child) {
-              return ref.read(profileDataProvider).when(data: (String? value) {
-                return Text(value!);
-              }, error: (error, stackTrace) {
-                return const Text("Error");
-              }, loading: () {
-                return const CircularProgressIndicator();
-              });
-            }),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Test.id);
-                  print('${ref.read(profileDataProvider)}');
-                },
-                child: const Text('press'))
-          ],
-        ),
+      appBar: AppBar(title: const Text('Test')),
+      body: Column(
+        children: [
+          MaterialButton(onPressed: () {
+            Stream stream = controller.stream;
+            stream.listen((event) {
+              print(event.toString());
+            });
+          }),
+          MaterialButton(onPressed: (() {}))
+        ],
       ),
     );
   }

@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/data.dart';
-import 'package:reservation_app/screens/home.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
@@ -36,24 +34,8 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
   // firebase auth
   final _auth = FirebaseAuth.instance;
 
-  // FORM variables
-  late Timestamp timestamp = Timestamp.fromDate(date);
   // bool
   bool isLoading = false;
-
-  // method to check if the user is signed in
-  void getCurrentUser() {
-    isLoading = true;
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        loggedInUser = user;
-      }
-      isLoading = false;
-    } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
-    }
-  }
 
   // booking service
   late BookingService reservationService;
@@ -71,7 +53,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
-  Stream<dynamic> getBookingStreamFirebase(
+  Stream<QuerySnapshot<Data>> getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
     return getBookingStream(placeId: 'reservation')
         .where('bookingStart', isGreaterThanOrEqualTo: start)
@@ -144,46 +126,8 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     return converted;
   }
 
-  /*  final List itemsSaturday = List<DateTime>.generate(
-      730,
-      (i) => DateTime.utc(2022, DateTime.september, 1, 7, 0)
-          .add(Duration(days: i)));
-
-  final List itemsSunday = List<DateTime>.generate(
-      730,
-      (i) => DateTime.utc(2022, DateTime.september, 1, 16, 0)
-          .add(Duration(days: i)));
-
-  final List<DateTime> listSaturday = [];
-
-  final List<DateTime> listSunday = [];
-
-  addSaturday(items) {
-    for (DateTime item in items) {
-      if (item.weekday == DateTime.saturday) {
-        listSaturday.add(item);
-      }
-    }
-  }
-
-  addSunday(items) {
-    for (DateTime item in items) {
-      if (item.weekday == DateTime.sunday) {
-        listSunday.add(item);
-      }
-    }
-  }
-
-  List<DateTimeRange> generatePauseSlots() {
-    List<DateTimeRange> dateTimeRangeList = [];
-    for (final pairs in IterableZip([listSaturday, listSunday])) {
-      dateTimeRangeList.add(DateTimeRange(start: pairs[0], end: pairs[1]));
-    }
-    return dateTimeRangeList;
-  } */
-
   DateTime now = DateTime.now();
-  late DateTime startDate = DateTime(now.year, now.month, now.day, 8);
+  late DateTime startDate = DateTime(now.year, now.month, now.day, 0);
 
   List<DateTimeRange> generatePauseSlots() {
     List<DateTimeRange> dateTimeRangeList = [];
@@ -198,13 +142,12 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
     reservationService = BookingService(
       serviceName: 'Reservation Service',
       serviceDuration: 120,
       bookingStart: DateTime(date.year, date.month, date.day, 8, 0),
       bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
-      userId: loggedInUser.uid,
+      userId: _auth.currentUser!.uid,
     );
 
     /* addSaturday(itemsSaturday);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:reservation_app/services/constants.dart';
-import 'package:reservation_app/screens/main_menu_screen.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -27,7 +27,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
     isLoading = true;
     final docRef = _firestore
         .collection('user')
-        .doc(loggedInUser.uid)
+        .doc(getCurrentUser()!.uid)
         .collection('profile')
         .get();
     await docRef.then(
@@ -40,20 +40,20 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   // firebase auth
   final _auth = FirebaseAuth.instance;
-  // creating our user
-  late User registeredUser;
 
   // method to check if the user is signed in
-  void getCurrentUser() {
+  User? getCurrentUser() {
+    late User loggedInUser;
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        registeredUser = user;
-        print(registeredUser.email);
+        loggedInUser = user;
       }
     } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
+      print(e);
     }
+    isLoading = false;
+    return loggedInUser;
   }
 
   @override

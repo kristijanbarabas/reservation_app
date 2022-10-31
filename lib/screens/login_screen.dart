@@ -13,8 +13,6 @@ import 'package:reservation_app/custom_widgets/google_sign_in.dart';
 
 // firebase auth
 final _auth = FirebaseAuth.instance;
-// creating our user
-late User loggedInUser;
 //firestore instance
 final _firestore = FirebaseFirestore.instance;
 
@@ -50,50 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
   late String password;
   late String userID;
 
-  // profile data
-  late Map<String, dynamic> firebaseData = {};
-  late Map<String, dynamic> fireProfile = {};
-  late String? phoneNumber;
-  late String? profilePicture;
-  late String? username;
-
-  getCurrentUser() {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        loggedInUser = user;
-      }
-    } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
-    }
-  }
-
-  getProfile() async {
-    final docRef = _firestore
-        .collection('user')
-        .doc(loggedInUser.uid)
-        .collection('profile')
-        .get();
-    await docRef.then(
-      (QuerySnapshot snapshot) {
-        for (var documentSnapshot in snapshot.docs) {
-          setState(() {
-            fireProfile = documentSnapshot.data() as Map<String, dynamic>;
-            profilePicture = fireProfile['userProfilePicture'];
-            username = fireProfile['username'];
-            phoneNumber = fireProfile['userPhoneNumber'];
-          });
-        }
-      },
-      onError: (e) =>
-          Alert(context: context, title: "Error", desc: "Try again!").show(),
-    );
-  }
-
-  // button radius
-  double buttonRadius = 35.0;
-
-  //
   void customSignInWithGoogle() async {
     try {
       showDialog(
@@ -126,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
+      print(e);
       Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
@@ -136,6 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
           email: email, password: password);
       if (existingUser != null) {
         Navigator.pushNamed(context, HomeScreen.id);
+        //Navigator.pushNamed(context, Test.id);
       }
     } catch (e) {
       Alert(context: context, title: "Error", desc: "Try again!").show();
