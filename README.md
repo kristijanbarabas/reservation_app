@@ -1,6 +1,7 @@
-# reservation_app
+# Studio Astrid appointment reservation app.
 
-A new Flutter project.
+For my first solo flutter project I've decided to build an appointment reservation app for my friend that has a Beauty studio.
+The point of the app is that her clients can easily make and cancel appointments instead of calling her and sending emails.
 
 ## Getting Started
 
