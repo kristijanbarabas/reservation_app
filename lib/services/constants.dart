@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// Delete reservation hint text
+const String kDeleteReservationHinText =
+    'Swipe left or right to delete your reservation!';
+
+// asset images path
+const String kLogoPath = 'assets/logo.png';
+
 // HINT TEXT
 const String kHintTextEmail = 'Enter your email...';
 const String kHintTextPassword = 'Enter your password...';

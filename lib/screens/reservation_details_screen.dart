@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:reservation_app/services/constants.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-//firestore instance
-final _firestore = FirebaseFirestore.instance;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ReservationScreen extends StatefulWidget {
   static const String id = 'reservation_screen';
@@ -22,8 +18,12 @@ class ReservationScreen extends StatefulWidget {
 }
 
 class _ReservationScreenState extends State<ReservationScreen> {
+  //firestore instance
+  final _firestore = FirebaseFirestore.instance;
+  //loading bool
   bool isLoading = true;
-  getReservation(index) async {
+  //
+  void getReservation(index) async {
     isLoading = true;
     final docRef = _firestore
         .collection('user')
@@ -34,7 +34,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
       (QuerySnapshot snapshot) {
         snapshot.docs[index].reference.delete();
       },
-      onError: (e) => print("Error getting document: $e"),
+      onError: (e) =>
+          Alert(context: context, title: "Error", desc: "Try again!").show(),
     );
   }
 
@@ -50,7 +51,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
         loggedInUser = user;
       }
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
     isLoading = false;
     return loggedInUser;

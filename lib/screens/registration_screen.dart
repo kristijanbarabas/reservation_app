@@ -21,17 +21,32 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  // email and password variables
+  // New user data
   late String email;
   late String password;
   late String username;
 
-  // firebase authentication
-  final _auth = FirebaseAuth.instance;
-
-  @override
-  void initState() {
-    super.initState();
+  void registerNewUser() async {
+    final auth = FirebaseAuth.instance;
+    try {
+      final newUser = await auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      if (newUser != null) {
+        _firestore
+            .collection('user')
+            .doc(newUser.user!.uid)
+            .collection('profile')
+            .doc(newUser.user!.uid)
+            .set(
+          {
+            'username': username,
+            'userPhoneNumber': 'Add phone number...',
+          },
+        ).whenComplete(() => Navigator.pushNamed(context, HomeScreen.id));
+      }
+    } catch (e) {
+      Alert(context: context, title: "Error", desc: "Try again!").show();
+    }
   }
 
   @override
@@ -63,7 +78,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 tag: 'logo',
                 child: SizedBox(
                   height: 100,
-                  child: Image.asset('assets/logo.png'),
+                  child: Image.asset(kLogoPath),
                 ),
               ),
             ),
@@ -105,36 +120,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 },
                 decoration:
                     kTextFieldDecoration.copyWith(hintText: kHintTextUsername)),
-
             // REGISTER BUTTON
             CustomRoundedButton(
               textStyle: kGoogleFonts,
               iconData: Icons.app_registration_rounded,
               title: kRegisterTitle,
-              onPressed: () async {
-                try {
-                  final newUser = await _auth.createUserWithEmailAndPassword(
-                      email: email, password: password);
-                  if (newUser != null) {
-                    // send the user to the reservation screen
-                    _firestore
-                        .collection('user')
-                        .doc(newUser.user!.uid)
-                        .collection('profile')
-                        .doc(newUser.user!.uid)
-                        .set(
-                      {
-                        'username': username,
-                        'userPhoneNumber': 'Add phone number...',
-                      },
-                    );
-                    Navigator.pushNamed(context, HomeScreen.id);
-                  }
-                } catch (e) {
-                  Alert(context: context, title: "Error", desc: "Try again!")
-                      .show();
-                }
-              },
+              onPressed: registerNewUser,
             ),
           ],
         ),

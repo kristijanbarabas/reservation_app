@@ -5,14 +5,14 @@ class ReservationDetails extends StatelessWidget {
   final String reservationTime;
   final String reservationDate;
   final DateTime date;
-  final String reservationEnd;
+  final String bookingEnd;
 
   const ReservationDetails(
       {Key? key,
       this.reservationTime = '',
       this.reservationDate = '',
       required this.date,
-      required this.reservationEnd})
+      required this.bookingEnd})
       : super(key: key);
 
   @override
@@ -48,7 +48,23 @@ class ReservationDetails extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Row(
+                            children: const [
+                              Icon(
+                                Icons.info,
+                                size: 30,
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(child: Text(kDeleteReservationHinText)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                     child: const Icon(Icons.delete, color: Colors.white)),
               ],
             ),

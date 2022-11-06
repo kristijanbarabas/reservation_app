@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:reservation_app/models/user_profile.dart';
+import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
-import 'package:reservation_app/services/cloud_storage.dart';
+import 'package:reservation_app/services/firestore_storage.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
 import 'package:reservation_app/custom_widgets/text_form_field_widget.dart';
 import 'package:reservation_app/services/constants.dart';
@@ -16,13 +16,10 @@ import 'package:reservation_app/services/firestore_database.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../custom_widgets/profile_picture_widget.dart';
 
-final _firestore = FirebaseFirestore.instance;
-late User loggedInUser;
-
 class ProfileScreen extends StatefulWidget {
   static const String id = 'profile_screen';
 
-  ProfileScreen({
+  const ProfileScreen({
     Key? key,
   }) : super(key: key);
 
@@ -31,6 +28,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final _firestore = FirebaseFirestore.instance;
+  late User loggedInUser;
   final CloudStorage storage = CloudStorage();
 // authentification
   final _auth = FirebaseAuth.instance;
@@ -41,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         loggedInUser = user;
       }
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
 
@@ -55,9 +54,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         this.image = imagePermanent;
       });
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const CustomLoadingWidget();
+          });
       await storage.uploadFile(image.path, loggedInUser.uid).then(
-            (value) => print('Done'),
+            (value) => Alert(
+                    context: context, title: "Success", desc: "Image uploaded!")
+                .show(),
           );
+      Navigator.pop(context);
       final ref = FirebaseStorage.instance
           .ref()
           .child('${loggedInUser.uid}/profilepicture.jpg');
@@ -69,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .doc(loggedInUser.uid);
       await docRef.set({'userProfilePicture': url}, SetOptions(merge: true));
     } catch (e) {
-      print(e);
+      Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
 

@@ -3,22 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
-import 'package:reservation_app/data.dart';
+import 'package:reservation_app/models/data.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/services/constants.dart';
-//import 'package:collection/collection.dart';
 
-// creating our user
-late User loggedInUser;
 //firestore instance
 final _firestore = FirebaseFirestore.instance;
-// DATE
-DateTime date = DateTime.now();
-CollectionReference reservationBookingStream = _firestore.collection('user');
-CollectionReference reservation =
-    _firestore.collection('user').doc('reservation').collection('reservation');
 
 class CustomBookingCalendar extends StatefulWidget {
   static const String id = 'custom_booking_calendar';
@@ -31,11 +22,20 @@ class CustomBookingCalendar extends StatefulWidget {
 }
 
 class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
-  // firebase auth
-  final _auth = FirebaseAuth.instance;
+  // Our user
+  late User loggedInUser;
+  //
 
+  // Firebase collection references
+  CollectionReference reservationBookingStream = _firestore.collection('user');
+  CollectionReference reservation = _firestore
+      .collection('user')
+      .doc('reservation')
+      .collection('reservation');
+  // Firebase auth
+  final _auth = FirebaseAuth.instance;
   // bool
-  bool isLoading = false;
+  bool isLoading = true;
 
   // booking service
   late BookingService reservationService;
@@ -53,7 +53,7 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
-  Stream<QuerySnapshot<Data>> getBookingStreamFirebase(
+  Stream<QuerySnapshot<Data>>? getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
     return getBookingStream(placeId: 'reservation')
         .where('bookingStart', isGreaterThanOrEqualTo: start)
@@ -63,6 +63,8 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
 
   Future<dynamic> uploadBooking({required BookingService newBooking}) async {
     await reservation.add(newBooking.toJson()).then((value) {
+      converted.add(DateTimeRange(
+          start: newBooking.bookingStart, end: newBooking.bookingEnd));
       Alert(
         context: context,
         type: AlertType.success,
@@ -103,32 +105,11 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     });
   }
 
-  late List<DateTimeRange> converted = [];
+  DateTime dateNow = DateTime.now();
+  late DateTime startDate =
+      DateTime(dateNow.year, dateNow.month, dateNow.day, 0);
 
-  List<DateTimeRange> convertStreamResult({required dynamic streamResult}) {
-    {
-      final docRef = reservation.get();
-      docRef.then((QuerySnapshot snapshot) {
-        snapshot.docs.forEach((DocumentSnapshot doc) {
-          Map<String, dynamic> fireData = doc.data() as Map<String, dynamic>;
-          final String reservationTime = fireData['bookingStart'];
-          final DateTime parsedReservationTime =
-              DateTime.parse(reservationTime);
-          final reservationDate = fireData['bookingEnd'];
-          final DateTime parsedReservationDate =
-              DateTime.parse(reservationDate);
-          final reservationWidget = DateTimeRange(
-              start: parsedReservationTime, end: parsedReservationDate);
-          return converted.add(reservationWidget);
-        });
-      });
-    }
-    return converted;
-  }
-
-  DateTime now = DateTime.now();
-  late DateTime startDate = DateTime(now.year, now.month, now.day, 0);
-
+  // Generated pause slots so the user can't pick a appointment that has passed - grey color
   List<DateTimeRange> generatePauseSlots() {
     List<DateTimeRange> dateTimeRangeList = [];
     if (startDate.weekday != DateTime.saturday &&
@@ -139,56 +120,72 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
     return dateTimeRangeList;
   }
 
+  // A list containg all the reservations - it shows the booked(red color) appointments
+  List<DateTimeRange> converted = [];
+  void convertedHelperFunction() async {
+    final documentReference = reservation.get();
+    await documentReference.then(
+      (QuerySnapshot snapshot) {
+        snapshot.docs.forEach(
+          (DocumentSnapshot documentSnapshot) {
+            Map<String, dynamic> fireData =
+                documentSnapshot.data() as Map<String, dynamic>;
+            final String reservationTime = fireData['bookingStart'];
+            final DateTime parsedReservationTime =
+                DateTime.parse(reservationTime);
+            final reservationDate = fireData['bookingEnd'];
+            final DateTime parsedReservationDate =
+                DateTime.parse(reservationDate);
+            final reservationWidget = DateTimeRange(
+                start: parsedReservationTime, end: parsedReservationDate);
+            converted.add(reservationWidget);
+            setState(() {
+              isLoading = false;
+            });
+          },
+        );
+      },
+    );
+  }
+
+  // List of booked appontiments required by the package
+  List<DateTimeRange> convertedStreamResult({required dynamic streamResult}) {
+    return converted;
+  }
+
   @override
   void initState() {
     super.initState();
     reservationService = BookingService(
       serviceName: 'Reservation Service',
       serviceDuration: 120,
-      bookingStart: DateTime(date.year, date.month, date.day, 8, 0),
-      bookingEnd: DateTime(date.year, date.month, date.day, 16, 0),
+      bookingStart: DateTime(dateNow.year, dateNow.month, dateNow.day, 8, 0),
+      bookingEnd: DateTime(dateNow.year, dateNow.month, dateNow.day, 16, 0),
       userId: _auth.currentUser!.uid,
     );
-
-    /* addSaturday(itemsSaturday);
-    addSunday(itemsSunday); */
+    convertedHelperFunction();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(5, 50, 5, 0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: BookingCalendar(
+          convertStreamResultToDateTimeRanges: convertedStreamResult,
+          bookingService: reservationService,
+          getBookingStream: getBookingStreamFirebase,
+          uploadBooking: uploadBooking,
+          bookingButtonText: 'SUBMIT',
+          bookingButtonColor: kButtonColor,
+          loadingWidget: const CustomLoadingWidget(),
+          uploadingWidget: const CustomLoadingWidget(),
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          bookingGridCrossAxisCount: 2,
+          disabledDays: const [6, 7],
+          pauseSlots: generatePauseSlots(),
         ),
       ),
-      child: isLoading
-          ? const SpinKitChasingDots(
-              color: Colors.black,
-              duration: Duration(seconds: 3),
-            )
-          : BookingCalendar(
-              bookingService: reservationService,
-              getBookingStream: getBookingStreamFirebase,
-              uploadBooking: uploadBooking,
-              convertStreamResultToDateTimeRanges: convertStreamResult,
-              bookingButtonText: 'SUBMIT',
-              bookingButtonColor: kButtonColor,
-              loadingWidget: const CustomLoadingWidget(),
-              uploadingWidget: const CustomLoadingWidget(),
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              bookingGridCrossAxisCount: 2,
-              disabledDays: const [6, 7],
-              pauseSlots: generatePauseSlots(),
-            ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

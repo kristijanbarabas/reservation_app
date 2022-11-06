@@ -24,15 +24,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Logo
             Hero(
               tag: 'logo',
-              child: Image.asset('assets/logo.png'),
+              child: Image.asset(kLogoPath),
             ),
             const SizedBox(
               height: 68.0,
             ),
-
-            // LOGIN BUTTON
+            // Login button
             CustomRoundedButton(
                 textStyle: kGoogleFonts,
                 iconData: Icons.login,
@@ -40,7 +40,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 onPressed: () {
                   Navigator.pushNamed(context, LoginScreen.id);
                 }),
-            // REGISTER BUTTON
+            // Register button
             CustomRoundedButton(
               textStyle: kGoogleFonts,
               iconData: Icons.app_registration_rounded,

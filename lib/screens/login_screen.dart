@@ -1,20 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/screens/home.dart';
-import 'package:reservation_app/screens/test.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
+
 import '../custom_widgets/rounded_button.dart';
 import '../services/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reservation_app/custom_widgets/google_sign_in.dart';
-
-// firebase auth
-final _auth = FirebaseAuth.instance;
-//firestore instance
-final _firestore = FirebaseFirestore.instance;
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -25,74 +17,20 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  }
-
+  // Firebase auth
+  final _auth = FirebaseAuth.instance;
   // email and password variables
   late String email;
   late String password;
-  late String userID;
 
-  void customSignInWithGoogle() async {
-    try {
-      showDialog(
-        context: context,
-        builder: (context) => const CustomLoadingWidget(),
-      );
-      await signInWithGoogle();
-      if (_auth.currentUser?.uid != null) {
-        final docRef = _firestore
-            .collection('user')
-            .doc(_auth.currentUser?.uid)
-            .collection('profile')
-            .doc(_auth.currentUser?.uid);
-        await docRef.get().then(
-          (DocumentSnapshot document) {
-            if (document.exists) {
-              // DO NOTHING
-            } else {
-              docRef.set(
-                {
-                  'username': _auth.currentUser?.displayName,
-                  'phoneNumber': _auth.currentUser?.phoneNumber,
-                  'userProfilePicture': _auth.currentUser?.photoURL,
-                },
-              );
-            }
-            Navigator.pop(context);
-            Navigator.pushNamed(context, HomeScreen.id);
-          },
-        );
-      }
-    } catch (e) {
-      print(e);
-      Alert(context: context, title: "Error", desc: "Try again!").show();
-    }
+  void navigatorPushToHomePage() {
+    Navigator.pushNamed(context, HomeScreen.id);
   }
 
   void customSignInWithEmailAndPassword() async {
     try {
-      final existingUser = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      if (existingUser != null) {
-        Navigator.pushNamed(context, HomeScreen.id);
-        //Navigator.pushNamed(context, Test.id);
-      }
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      navigatorPushToHomePage();
     } catch (e) {
       Alert(context: context, title: "Error", desc: "Try again!").show();
     }
@@ -127,14 +65,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 tag: 'logo',
                 child: SizedBox(
                   height: 100,
-                  child: Image.asset('assets/logo.png'),
+                  child: Image.asset(kLogoPath),
                 ),
               ),
             ),
             const SizedBox(
               height: 54.0,
             ),
-            // EMAIL INPUT
+            // Email input
             TextField(
               style: kTextFieldInputStyle,
               keyboardType: TextInputType.emailAddress,
@@ -148,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 8.0,
             ),
-            // PASSWORD INPUT
+            // Password input
             TextField(
                 style: kTextFieldInputStyle,
                 obscureText: true,
@@ -161,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 24.0,
             ),
-            // LOGIN BUTTON
+            // Sign in button
             CustomRoundedButton(
               iconData: Icons.login,
               textStyle: kGoogleFonts,
@@ -180,10 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 8,
             ),
-            // GOOGLE LOGIN BUTTON
-            CustomGoogleSignInButton(
-              function: customSignInWithGoogle,
-            ),
+            // Google login button
+            const CustomGoogleSignInButton(),
           ],
         ),
       ),
