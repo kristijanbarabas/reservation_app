@@ -1,12 +1,8 @@
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:reservation_app/custom_widgets/loading_widget.dart';
+import 'package:reservation_app/custom_widgets/pick_image_widget.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
-import 'package:reservation_app/services/firestore_storage.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
 import 'package:reservation_app/custom_widgets/text_form_field_widget.dart';
 import 'package:reservation_app/services/constants.dart';
@@ -30,7 +26,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _firestore = FirebaseFirestore.instance;
   late User loggedInUser;
-  final CloudStorage storage = CloudStorage();
 // authentification
   final _auth = FirebaseAuth.instance;
   getCurrentUser() {
@@ -39,42 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (user != null) {
         loggedInUser = user;
       }
-    } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
-    }
-  }
-
-  File? image;
-
-  Future pickImage(source) async {
-    try {
-      final image = await ImagePicker().pickImage(source: source);
-      if (image == null) return;
-      final imagePermanent = File(image.path);
-      setState(() {
-        this.image = imagePermanent;
-      });
-      showDialog(
-          context: context,
-          builder: (context) {
-            return const CustomLoadingWidget();
-          });
-      await storage.uploadFile(image.path, loggedInUser.uid).then(
-            (value) => Alert(
-                    context: context, title: "Success", desc: "Image uploaded!")
-                .show(),
-          );
-      Navigator.pop(context);
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('${loggedInUser.uid}/profilepicture.jpg');
-      String url = await ref.getDownloadURL();
-      final docRef = _firestore
-          .collection('user')
-          .doc(loggedInUser.uid)
-          .collection('profile')
-          .doc(loggedInUser.uid);
-      await docRef.set({'userProfilePicture': url}, SetOptions(merge: true));
     } catch (e) {
       Alert(context: context, title: "Error", desc: "Try again!").show();
     }
@@ -300,52 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     imageWidth: 200,
                                   ),
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                Alert(
-                                  context: context,
-                                  type: AlertType.warning,
-                                  title: "PICK AN IMAGE!",
-                                  buttons: [
-                                    DialogButton(
-                                      onPressed: () async {
-                                        pickImage(ImageSource.gallery);
-                                        Navigator.pop(context);
-                                      },
-                                      color: kButtonColor,
-                                      child: const Text(
-                                        "GALLERY",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                      ),
-                                    ),
-                                    DialogButton(
-                                      onPressed: () async {
-                                        pickImage(ImageSource.camera);
-                                        Navigator.pop(context);
-                                      },
-                                      color: kButtonColor,
-                                      child: const Text(
-                                        "CAMERA",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                      ),
-                                    )
-                                  ],
-                                ).show();
-                              },
-                              child: const CircleAvatar(
-                                backgroundColor: Colors.white,
-                                child: FaIcon(
-                                  FontAwesomeIcons.images,
-                                  color: kBackgroundColor,
-                                ),
-                              ),
-                            ),
-                          ),
+                          const PickImageWidget(),
                         ],
                       ),
                       const SizedBox(

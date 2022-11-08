@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:reservation_app/screens/home.dart';
+import 'package:reservation_app/custom_widgets/sign_in_button.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
-
-import '../custom_widgets/rounded_button.dart';
 import '../services/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:reservation_app/custom_widgets/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,24 +13,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Firebase auth
-  final _auth = FirebaseAuth.instance;
-  // email and password variables
-  late String email;
-  late String password;
-
-  void navigatorPushToHomePage() {
-    Navigator.pushNamed(context, HomeScreen.id);
-  }
-
-  void customSignInWithEmailAndPassword() async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      navigatorPushToHomePage();
-    } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
-    }
-  }
+  // User data
+  late String? email = '';
+  late String? password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
               keyboardType: TextInputType.emailAddress,
               textAlign: TextAlign.center,
               onChanged: (value) {
-                email = value;
+                setState(() {
+                  email = value;
+                });
               },
               decoration:
                   kTextFieldDecoration.copyWith(hintText: kHintTextEmail),
@@ -92,7 +75,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
                 textAlign: TextAlign.center,
                 onChanged: (value) {
-                  password = value;
+                  setState(() {
+                    password = value;
+                  });
                 },
                 decoration:
                     kTextFieldDecoration.copyWith(hintText: kHintTextPassword)),
@@ -100,12 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 24.0,
             ),
             // Sign in button
-            CustomRoundedButton(
-              iconData: Icons.login,
-              textStyle: kGoogleFonts,
-              title: kLoginTitle,
-              onPressed: customSignInWithEmailAndPassword,
-            ),
+            SignInButton(email: email, password: password),
             const SizedBox(
               height: 24.0,
             ),
