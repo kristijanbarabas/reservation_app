@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:reservation_app/services/constants.dart';
 
 class CustomTextFormFieldWidget extends StatelessWidget {
-  void Function(String?) newValue;
+  final void Function(String?) newValue;
   final String initialValue;
 
-  CustomTextFormFieldWidget(
+  const CustomTextFormFieldWidget(
       {Key? key, required this.newValue, required this.initialValue})
       : super(key: key);
 

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
-import 'package:reservation_app/models/data.dart';
+import 'package:reservation_app/models/reservation_data.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/services/constants.dart';
@@ -41,19 +41,21 @@ class _CustomBookingCalendarState extends State<CustomBookingCalendar> {
   late BookingService reservationService;
 
   ///This is how can you get the reference to your data from the collection, and serialize the data with the help of the Firestore [withConverter]. This function would be in your repository.
-  CollectionReference<Data> getBookingStream({required String placeId}) {
+  CollectionReference<ReservationData> getBookingStream(
+      {required String placeId}) {
     return reservationBookingStream
         .doc(placeId)
         .collection('reservation')
-        .withConverter<Data>(
-          fromFirestore: (snapshots, _) => Data.fromJson(snapshots.data()!),
+        .withConverter<ReservationData>(
+          fromFirestore: (snapshots, _) =>
+              ReservationData.fromJson(snapshots.data()!),
           toFirestore: (snapshots, _) => snapshots.toJson(),
         );
   }
 
   ///How you actually get the stream of data from Firestore with the help of the previous function
   ///note that this query filters are for my data structure, you need to adjust it to your solution.
-  Stream<QuerySnapshot<Data>>? getBookingStreamFirebase(
+  Stream<QuerySnapshot<ReservationData>>? getBookingStreamFirebase(
       {required DateTime end, required DateTime start}) {
     return getBookingStream(placeId: 'reservation')
         .where('bookingStart', isGreaterThanOrEqualTo: start)

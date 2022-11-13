@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-part 'data.g.dart';
+part 'reservation_data.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class Data {
+class ReservationData {
   static DateTime timeStampToDateTime(Timestamp timestamp) {
     return DateTime.parse(timestamp.toDate().toString());
   }
@@ -35,7 +35,7 @@ class Data {
   final String? phoneNumber;
   final String? placeAddress;
 
-  Data(
+  ReservationData(
       {this.email,
       this.phoneNumber,
       this.placeAddress,
@@ -49,7 +49,8 @@ class Data {
 
   /// Connect the generated [_$DataFromJson] function to the `fromJson`
   /// factory.
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
+  factory ReservationData.fromJson(Map<String, dynamic> json) =>
+      _$DataFromJson(json);
 
   /// Connect the generated [_$DataToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$DataToJson(this);

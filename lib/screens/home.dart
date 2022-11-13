@@ -99,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   late List<Widget> screens = [
-    MainMenu(),
+    const MainMenu(),
     const CustomBookingCalendar(),
-    ProfileScreen(),
+    const ProfileScreen(),
   ];
 
   @override

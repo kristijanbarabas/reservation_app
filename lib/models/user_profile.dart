@@ -3,17 +3,17 @@ import 'package:meta/meta.dart';
 
 @immutable
 class UserProfile extends Equatable {
+  final String userId;
+  late String? username;
+  late String? userPhoneNumber;
+  final String? userProfilePicture;
+
   UserProfile({
     required this.userId,
     required this.username,
     required this.userPhoneNumber,
     required this.userProfilePicture,
   });
-
-  final String userId;
-  late String? username;
-  late String? userPhoneNumber;
-  final String? userProfilePicture;
 
   @override
   List<Object> get props => [userId];

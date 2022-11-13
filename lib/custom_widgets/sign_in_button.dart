@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
 import '../screens/home.dart';
 import '../services/constants.dart';
 

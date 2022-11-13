@@ -1,17 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'data.dart';
+part of 'reservation_data.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+ReservationData _$DataFromJson(Map<String, dynamic> json) => ReservationData(
       email: json['email'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
       placeAddress: json['placeAddress'] as String?,
-      bookingStart: Data.timeStampToDateTime(json['bookingStart'] as Timestamp),
-      bookingEnd: Data.timeStampToDateTime(json['bookingEnd'] as Timestamp),
+      bookingStart: ReservationData.timeStampToDateTime(
+          json['bookingStart'] as Timestamp),
+      bookingEnd:
+          ReservationData.timeStampToDateTime(json['bookingEnd'] as Timestamp),
       placeId: json['placeId'] as String?,
       userId: json['userId'] as String?,
       serviceName: json['serviceName'] as String?,
@@ -19,14 +21,16 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
       servicePrice: json['servicePrice'] as int?,
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$DataToJson(ReservationData instance) =>
+    <String, dynamic>{
       'userId': instance.userId,
       'placeId': instance.placeId,
       'serviceName': instance.serviceName,
       'serviceDuration': instance.serviceDuration,
       'servicePrice': instance.servicePrice,
-      'bookingStart': Data.dateTimeToTimeStamp(instance.bookingStart),
-      'bookingEnd': Data.dateTimeToTimeStamp(instance.bookingEnd),
+      'bookingStart':
+          ReservationData.dateTimeToTimeStamp(instance.bookingStart),
+      'bookingEnd': ReservationData.dateTimeToTimeStamp(instance.bookingEnd),
       'email': instance.email,
       'phoneNumber': instance.phoneNumber,
       'placeAddress': instance.placeAddress,

@@ -230,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
           title: Text(
             'Profile',
-            style: kGoogleFonts,
+            style: kMainMenuFonts,
           ),
         ),
         body: Consumer(builder: (context, ref, child) {
@@ -259,6 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     imageWidth: 200,
                                   ),
                           ),
+                          // Pick image from gallery or camera
                           const PickImageWidget(),
                         ],
                       ),

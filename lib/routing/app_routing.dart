@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:reservation_app/screens/test.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../screens/booking_calendar.dart';
 import '../screens/home.dart';
@@ -12,5 +11,4 @@ Map<String, WidgetBuilder> appRoutes = {
   LoginScreen.id: (context) => const LoginScreen(),
   HomeScreen.id: (context) => const HomeScreen(),
   CustomBookingCalendar.id: (context) => const CustomBookingCalendar(),
-  Test.id: (context) => const Test(),
 };

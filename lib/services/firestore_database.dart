@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reservation_app/custom_widgets/reservation_details.dart';
+import 'package:reservation_app/models/reservation_data.dart';
+import 'package:reservation_app/models/reservations.dart';
 import 'package:reservation_app/services/firestore_path.dart';
 import 'package:reservation_app/services/firestore_service.dart';
 import 'package:reservation_app/models/user_profile.dart';
@@ -12,6 +15,14 @@ class FirestoreDatabase {
 
   final _service = FirestoreService.instance;
   final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  late Stream<QuerySnapshot<Object?>> reservationStream = _firestore
+      .collection('user')
+      .doc('reservation')
+      .collection('reservation')
+      .where('userId', isEqualTo: _auth.currentUser?.uid)
+      .snapshots();
 
   // User profile data stream
   Stream<UserProfile> profileStream({required String? profileId}) =>
@@ -20,8 +31,14 @@ class FirestoreDatabase {
         builder: (data, documentId) => UserProfile.fromMap(data, documentId),
       );
 
+  // User reservation profile data stream
+  Stream<List<ReservationDetails>> reservationsStream() => _service.queryStream(
+        query: FirestorePath.reservationQuery(uid!),
+        builder: (data) => data,
+      );
+
   // Delete a reservation
-  void deleteReservationOnSwipe(String bookingEnd) async {
+  void deleteReservationOnSwipe({required String bookingEnd}) async {
     final docRef = _firestore
         .collection('user')
         .doc('reservation')
@@ -59,4 +76,10 @@ final userProfileProvider =
     StreamProvider.autoDispose.family<UserProfile, String?>((ref, profileId) {
   final database = ref.watch(databaseProvider);
   return database!.profileStream(profileId: profileId);
+});
+
+final userReservationProvider =
+    StreamProvider.autoDispose<List<ReservationDetails>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database!.reservationsStream();
 });

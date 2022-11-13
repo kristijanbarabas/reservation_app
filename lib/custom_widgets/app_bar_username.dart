@@ -20,7 +20,7 @@ class AppBarUsernameWidget extends StatelessWidget {
                 ? const Text('Welcome!')
                 : Text(
                     'Welcome ${userProfile.username}!',
-                    style: kGoogleFonts,
+                    style: kMainMenuFonts,
                   );
           },
           loading: () => const CircularProgressIndicator(),

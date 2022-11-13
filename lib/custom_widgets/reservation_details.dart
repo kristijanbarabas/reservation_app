@@ -65,7 +65,8 @@ class ReservationDetails extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Icon(Icons.delete, color: Colors.white)),
+                    child: const Icon(Icons.delete,
+                        color: Colors.white, size: 30.0)),
               ],
             ),
           ),

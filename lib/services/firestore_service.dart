@@ -1,6 +1,8 @@
 library firestore_service;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reservation_app/custom_widgets/reservation_details.dart';
+import 'package:reservation_app/models/reservations.dart';
 
 class FirestoreService {
   FirestoreService._();
@@ -57,5 +59,39 @@ class FirestoreService {
     final Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots =
         reference.snapshots();
     return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id));
+  }
+
+  Stream<T> queryStream<T>({
+    required Query<Map<String, dynamic>> query,
+    required T Function(List<ReservationDetails> data) builder,
+  }) {
+    late Map<String, dynamic> fireData;
+    final Query<Map<String, dynamic>> reference = query;
+    final Stream<QuerySnapshot<Map<String, dynamic>>> snapshots =
+        reference.snapshots();
+    return snapshots.map((event) {
+      final allReservations = event.docs;
+      List<ReservationDetails> reservationList = [];
+      for (var reservation in allReservations) {
+        fireData = reservation.data();
+        final reservations = Reservations.fromMap(fireData);
+        final String? bookingStart = reservations.bookingStart;
+        final DateTime parsedReservationStart = DateTime.parse(bookingStart!);
+        final String? bookingEnd = reservations.bookingEnd;
+        final DateTime parsedReservationEnd = DateTime.parse(bookingEnd!);
+        final String sortReservationDate =
+            '${parsedReservationEnd.day}.${parsedReservationEnd.month}.${parsedReservationEnd.year}';
+        final reservationWidget = ReservationDetails(
+          date: parsedReservationEnd,
+          bookingEnd: bookingEnd,
+          reservationTime:
+              '${parsedReservationStart.hour}:00 - ${parsedReservationEnd.hour}:00',
+          reservationDate: sortReservationDate,
+        );
+        reservationList.add(reservationWidget);
+        reservationList.sort((a, b) => a.date.compareTo(b.date));
+      }
+      return builder(reservationList);
+    });
   }
 }
