@@ -1,6 +1,6 @@
 # Studio Astrid appointment reservation app.
 
-For my first solo mobile app project I've decided to build an appointment reservation app for my friends Beauty studio using Flutter, Firebase and Riverpod for state management with the Layer first project structure. 
+For my first solo mobile app project I've decided to build an appointment reservation app for my friends Beauty studio using Flutter, Firebase and Riverpod, with the Layer first project structure. 
 The point of the app is that her clients can easily make and cancel appointments instead of calling her and sending emails.
 
 
