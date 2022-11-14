@@ -79,14 +79,14 @@ class FirestoreService {
         final DateTime parsedReservationStart = DateTime.parse(bookingStart!);
         final String? bookingEnd = reservations.bookingEnd;
         final DateTime parsedReservationEnd = DateTime.parse(bookingEnd!);
-        final String sortReservationDate =
+        final String reservationDate =
             '${parsedReservationEnd.day}.${parsedReservationEnd.month}.${parsedReservationEnd.year}';
         final reservationWidget = ReservationDetails(
           date: parsedReservationEnd,
           bookingEnd: bookingEnd,
           reservationTime:
               '${parsedReservationStart.hour}:00 - ${parsedReservationEnd.hour}:00',
-          reservationDate: sortReservationDate,
+          reservationDate: reservationDate,
         );
         reservationList.add(reservationWidget);
         reservationList.sort((a, b) => a.date.compareTo(b.date));
