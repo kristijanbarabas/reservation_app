@@ -5,6 +5,7 @@ import 'package:reservation_app/screens/welcome_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'routing/app_routing.dart';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,11 +20,18 @@ class ReservationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final goRouter = GoRouter(routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+    ]);
+    return MaterialApp.router(
+      routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(),
-      initialRoute: WelcomeScreen.id,
-      routes: appRoutes,
+      /* initialRoute: WelcomeScreen.id,
+      routes: appRoutes, */
     );
   }
 }
