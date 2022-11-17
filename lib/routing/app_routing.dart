@@ -5,6 +5,7 @@ import '../screens/home.dart';
 import '../screens/sign_in_screen.dart';
 import '../screens/registration_screen.dart';
 
+//TODO delete this file after migration to GoRouter
 Map<String, WidgetBuilder> appRoutes = {
   WelcomeScreen.id: (context) => const WelcomeScreen(),
   RegistrationScreen.id: (context) => const RegistrationScreen(),
