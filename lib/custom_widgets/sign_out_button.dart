@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:reservation_app/screens/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reservation_app/routing/app_router.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../services/constants.dart';
 
@@ -38,7 +39,7 @@ class SignOutButton extends StatelessWidget {
             DialogButton(
               onPressed: () {
                 signoutUser();
-                Navigator.pushNamed(context, WelcomeScreen.id);
+                context.pushNamed(AppRoutes.welcome.name);
               },
               color: kButtonColor,
               child: const Text(

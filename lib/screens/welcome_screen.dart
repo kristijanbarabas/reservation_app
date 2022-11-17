@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
+import 'package:reservation_app/routing/app_router.dart';
 import 'package:reservation_app/services/constants.dart';
-import 'package:reservation_app/screens/login_screen.dart';
-import 'package:reservation_app/screens/registration_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const id = 'welcome_screen';
@@ -26,7 +26,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             // Logo
             Hero(
-              tag: 'logo',
+              tag: kHeroTag,
               child: Image.asset(kLogoPath),
             ),
             const SizedBox(
@@ -37,17 +37,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 textStyle: kGoogleFonts,
                 iconData: Icons.login,
                 title: kLoginTitle,
-                onPressed: () {
-                  Navigator.pushNamed(context, LoginScreen.id);
-                }),
+                onPressed: () => context.goNamed(AppRoutes.login.name)),
             // Register button
             CustomRoundedButton(
               textStyle: kGoogleFonts,
               iconData: Icons.app_registration_rounded,
               title: kRegisterTitle,
-              onPressed: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
+              onPressed: () => context.goNamed(AppRoutes.register.name),
             )
           ],
         ),

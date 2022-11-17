@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reservation_app/custom_widgets/sign_in_button.dart';
-import 'package:reservation_app/screens/welcome_screen.dart';
 import '../services/constants.dart';
 import 'package:reservation_app/custom_widgets/google_sign_in.dart';
 
@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         leading: GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, WelcomeScreen.id);
+              GoRouter.of(context).pop();
             },
             child: const Icon(Icons.arrow_back)),
         automaticallyImplyLeading: false,
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Flexible(
               child: Hero(
-                tag: 'logo',
+                tag: kHeroTag,
                 child: SizedBox(
                   height: 100,
                   child: Image.asset(kLogoPath),
@@ -85,7 +85,10 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 24.0,
             ),
             // Sign in button
-            SignInButton(email: email, password: password),
+            SignInButton(
+              email: email,
+              password: password,
+            ),
             const SizedBox(
               height: 24.0,
             ),
@@ -99,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8,
             ),
             // Google login button
-            const CustomGoogleSignInButton(),
+            const GoogleSignInButton(),
           ],
         ),
       ),

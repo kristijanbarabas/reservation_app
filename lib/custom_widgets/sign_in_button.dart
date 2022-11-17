@@ -1,39 +1,30 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import '../screens/home.dart';
+import 'package:reservation_app/services/authentication.dart';
 import '../services/constants.dart';
 
-class SignInButton extends StatefulWidget {
+class SignInButton extends ConsumerWidget {
   final String? email;
   final String? password;
-  const SignInButton({super.key, required this.email, required this.password});
+  const SignInButton({
+    super.key,
+    required this.email,
+    required this.password,
+  });
 
   @override
-  State<SignInButton> createState() => _SignInButtonState();
-}
-
-class _SignInButtonState extends State<SignInButton> {
-  @override
-  Widget build(BuildContext context) {
-    void customSignInWithEmailAndPassword() async {
-      FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      try {
-        await firebaseAuth
-            .signInWithEmailAndPassword(
-                email: widget.email!, password: widget.password!)
-            .whenComplete(() => Navigator.pushNamed(context, HomeScreen.id));
-      } catch (e) {
-        Alert(context: context, title: "Error", desc: "Try again!").show();
-      }
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customSignInWithEmailAndPassword =
+        ref.watch(authenticationFunctionsProvider);
 
     return CustomRoundedButton(
       iconData: Icons.login,
       textStyle: kGoogleFonts,
       title: kLoginTitle,
-      onPressed: customSignInWithEmailAndPassword,
+      onPressed: () => customSignInWithEmailAndPassword!
+          .customSignInWithEmailAndPassword(
+              email: email, password: password, context: context),
     );
   }
 }

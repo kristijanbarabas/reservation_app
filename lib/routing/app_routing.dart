@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:reservation_app/screens/welcome_screen.dart';
 import '../screens/booking_calendar.dart';
 import '../screens/home.dart';
-import '../screens/login_screen.dart';
+import '../screens/sign_in_screen.dart';
 import '../screens/registration_screen.dart';
 
 Map<String, WidgetBuilder> appRoutes = {

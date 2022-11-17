@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/models/user_profile.dart';
+import 'package:reservation_app/services/authentication.dart';
 import 'package:reservation_app/services/constants.dart';
 import '../services/firestore_database.dart';
 
@@ -11,10 +11,10 @@ class AppBarUsernameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     return Consumer(builder: (context, ref, child) {
+      final loggedInUserUid = ref.watch(loggedInUserUidProvider);
       final userProfileAsyncValue =
-          ref.watch(userProfileProvider(firebaseAuth.currentUser?.uid));
+          ref.watch(userProfileProvider(loggedInUserUid));
       return AsyncValueWidget<UserProfile>(
         value: userProfileAsyncValue,
         data: (userProfile) {

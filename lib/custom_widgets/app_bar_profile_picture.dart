@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/profile_picture_widget.dart';
 import 'package:reservation_app/models/user_profile.dart';
+import 'package:reservation_app/services/authentication.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 
 class AppBarProfilePictureWidget extends StatelessWidget {
@@ -12,13 +12,12 @@ class AppBarProfilePictureWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
-    late Widget profilePictureWidget;
     return Consumer(
       builder: (context, ref, child) {
+        late Widget profilePictureWidget;
+        final loggedInUserUid = ref.watch(loggedInUserUidProvider);
         final userProfileAsyncValue =
-            ref.watch(userProfileProvider(firebaseAuth.currentUser?.uid));
+            ref.watch(userProfileProvider(loggedInUserUid));
         return AsyncValueWidget<UserProfile>(
           value: userProfileAsyncValue,
           data: (userProfile) {

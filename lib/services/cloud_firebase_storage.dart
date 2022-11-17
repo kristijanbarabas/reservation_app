@@ -9,7 +9,6 @@ class CloudStorage {
 
   Future<void> uploadFile(String filePath, String loggedInUserUid) async {
     File file = File(filePath);
-
     try {
       await storage.ref('$loggedInUserUid/profilepicture.jpg').putFile(file);
     } on firebase_core.FirebaseException catch (e) {

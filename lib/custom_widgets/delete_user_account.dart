@@ -1,49 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reservation_app/services/firestore_database.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../screens/welcome_screen.dart';
+import '../routing/app_router.dart';
 import '../services/constants.dart';
 
-class DeleteUserAccountAndData extends StatelessWidget {
+class DeleteUserAccountAndData extends ConsumerWidget {
   const DeleteUserAccountAndData({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final auth = FirebaseAuth.instance;
-    final firestore = FirebaseFirestore.instance;
-    deleteUser() {
-      auth.currentUser?.delete();
-    }
-
-    deleteUserProfile() {
-      firestore
-          .collection("user")
-          .doc(auth.currentUser?.uid)
-          .collection('profile')
-          .doc(auth.currentUser?.uid)
-          .delete();
-    }
-
-    deleteUserReservations() async {
-      final docRef = firestore
-          .collection("user")
-          .doc('reservation')
-          .collection('reservation')
-          .where('userId', isEqualTo: auth.currentUser?.uid)
-          .get();
-      await docRef.then(
-        (querySnapshot) {
-          querySnapshot.docs.forEach(
-            (doc) {
-              doc.reference.delete();
-            },
-          );
-        },
-      );
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
 
     return FloatingActionButton(
       onPressed: () {
@@ -56,10 +25,8 @@ class DeleteUserAccountAndData extends StatelessWidget {
           buttons: [
             DialogButton(
               onPressed: () {
-                deleteUserProfile();
-                deleteUserReservations();
-                deleteUser();
-                Navigator.pushNamed(context, WelcomeScreen.id);
+                database!.deleteAllUserDataAndReservations();
+                context.pushNamed(AppRoutes.welcome.name);
               },
               color: kButtonColor,
               child: const Text(

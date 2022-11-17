@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/rounded_button.dart';
 import 'package:reservation_app/custom_widgets/text_form_field_widget.dart';
 import 'package:reservation_app/models/user_profile.dart';
-
+import 'package:reservation_app/services/authentication.dart';
 import '../services/constants.dart';
 import '../services/firestore_database.dart';
 
@@ -15,22 +13,11 @@ class ProfileDataBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = FirebaseAuth.instance;
-    final firestore = FirebaseFirestore.instance;
-    updateProfile(String? username, String? userPhoneNumber) async {
-      final docRef = firestore
-          .collection('user')
-          .doc(auth.currentUser!.uid)
-          .collection('profile')
-          .doc(auth.currentUser!.uid);
-      await docRef.set(
-          {'username': username, 'userPhoneNumber': userPhoneNumber},
-          SetOptions(merge: true));
-    }
-
     return Consumer(builder: ((context, ref, child) {
+      final database = ref.watch(databaseProvider);
+      final loggedInUserUid = ref.watch(loggedInUserUidProvider);
       final userProfileAsyncValue =
-          ref.watch(userProfileProvider(auth.currentUser?.uid));
+          ref.watch(userProfileProvider(loggedInUserUid));
       return AsyncValueWidget<UserProfile>(
         value: userProfileAsyncValue,
         data: (userProfile) {
@@ -92,7 +79,7 @@ class ProfileDataBottomSheet extends StatelessWidget {
                     CustomRoundedButton(
                         title: kSubmit,
                         onPressed: () {
-                          updateProfile(userProfile.username,
+                          database!.updateProfile(userProfile.username,
                               userProfile.userPhoneNumber);
                           Navigator.pop(context);
                         },

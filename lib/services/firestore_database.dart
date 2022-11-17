@@ -1,28 +1,18 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reservation_app/custom_widgets/reservation_details.dart';
-import 'package:reservation_app/models/reservation_data.dart';
-import 'package:reservation_app/models/reservations.dart';
 import 'package:reservation_app/services/firestore_path.dart';
 import 'package:reservation_app/services/firestore_service.dart';
 import 'package:reservation_app/models/user_profile.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreDatabase {
   FirestoreDatabase({required this.uid});
   final String? uid;
 
   final _service = FirestoreService.instance;
-  final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-
-  late Stream<QuerySnapshot<Object?>> reservationStream = _firestore
-      .collection('user')
-      .doc('reservation')
-      .collection('reservation')
-      .where('userId', isEqualTo: _auth.currentUser?.uid)
-      .snapshots();
 
   // User profile data stream
   Stream<UserProfile> profileStream({required String? profileId}) =>
@@ -33,18 +23,13 @@ class FirestoreDatabase {
 
   // User reservation profile data stream
   Stream<List<ReservationDetails>> reservationsStream() => _service.queryStream(
-        query: FirestorePath.reservationQuery(uid!),
+        query: FirestorePath.reservationQueryPath(uid!),
         builder: (data) => data,
       );
 
-  // Delete a reservation
+  // Delete a reservation from a list on swipe
   void deleteReservationOnSwipe({required String bookingEnd}) async {
-    final docRef = _firestore
-        .collection('user')
-        .doc('reservation')
-        .collection('reservation')
-        .where('bookingEnd', isEqualTo: bookingEnd)
-        .get();
+    final docRef = FirestorePath.deleteReservationByQueryPath(bookingEnd).get();
     await docRef.then(
       (querySnapshot) {
         querySnapshot.docs.forEach(
@@ -54,6 +39,42 @@ class FirestoreDatabase {
         );
       },
     );
+  }
+
+  // Update profile
+  updateProfile(String? username, String? userPhoneNumber) async {
+    final docRef = FirestorePath.updateUserProfilePath(_auth.currentUser!.uid);
+    await docRef.set({'username': username, 'userPhoneNumber': userPhoneNumber},
+        SetOptions(merge: true));
+  }
+
+  // Delete user profile and all data
+  deleteUser() {
+    _auth.currentUser?.delete();
+  }
+
+  deleteUserProfile() {
+    FirestorePath.userProfileDocumentPath(_auth.currentUser!.uid).delete();
+  }
+
+  deleteUserReservations() async {
+    final docRef =
+        FirestorePath.deleteUserReservationsPath(_auth.currentUser!.uid).get();
+    await docRef.then(
+      (querySnapshot) {
+        querySnapshot.docs.forEach(
+          (doc) {
+            doc.reference.delete();
+          },
+        );
+      },
+    );
+  }
+
+  deleteAllUserDataAndReservations() async {
+    await deleteUser();
+    await deleteUserProfile();
+    await deleteUserReservations();
   }
 }
 

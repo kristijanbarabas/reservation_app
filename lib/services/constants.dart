@@ -7,6 +7,8 @@ const String kDeleteReservationHinText =
 
 // asset images path
 const String kLogoPath = 'assets/logo.png';
+// hero tag
+const String kHeroTag = 'logo';
 
 // HINT TEXT
 const String kHintTextEmail = 'Enter your email...';
