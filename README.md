@@ -4,6 +4,7 @@ For my first solo mobile app project I've decided to build an appointment reserv
 The point of the app is that her clients can easily make and cancel appointments instead of calling her and sending emails.
 
 ![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot1.jpg)
+![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot2.jpg)
 
 ## Getting Started
 
