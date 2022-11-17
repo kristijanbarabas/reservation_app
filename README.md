@@ -6,6 +6,8 @@ The point of the app is that her clients can easily make and cancel appointments
 ![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot1.jpg)
 ![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot2.jpg)
 ![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot3.jpg)
+![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot4.jpg)
+![](https://github.com/kristijanbarabas/reservation_app/blob/master/screenshots/screenshot5.jpg)
 
 ## Getting Started
 
