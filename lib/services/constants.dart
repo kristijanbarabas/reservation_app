@@ -40,7 +40,7 @@ const Color kModalSheetRadiusColor = Color(0xff191a18);
 
 // BUTTON TITLES
 const String kLoginTitle = 'Sign in';
-const String kRegisterTitle = 'Register';
+const String kSignUp = 'Sign Up';
 const String kSubmit = 'Submit';
 const String kEditProfile = 'Edit Profile';
 // TEXT FIELD DECORATION

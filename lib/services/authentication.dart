@@ -8,7 +8,7 @@ import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:reservation_app/services/firestore_path.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import '../routing/app_router.dart';
+import '../routing/go_router.dart';
 
 class Authentication {
   Authentication({this.uid});
@@ -16,20 +16,14 @@ class Authentication {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   // Sign in with email
-  void customSignInWithEmailAndPassword({
+  Future<void> customSignInWithEmailAndPassword({
     required String? email,
     required String? password,
     required BuildContext context,
   }) async {
     try {
-      await auth
-          .signInWithEmailAndPassword(email: email!, password: password!)
-          .whenComplete(() => {
-                if (auth.currentUser != null)
-                  context.goNamed(AppRoutes.home.name)
-              });
+      await auth.signInWithEmailAndPassword(email: email!, password: password!);
     } catch (e) {
-      debugPrint(e.toString());
       Alert(context: context, title: "Error", desc: "Try again!").show();
     }
   }
@@ -55,10 +49,6 @@ class Authentication {
   // Full google sign in function that displays a loading animation while checking if the user has already signed in before
   void customSignInWithGoogle(BuildContext context) async {
     try {
-      showDialog(
-        context: context,
-        builder: (context) => const CustomLoadingWidget(),
-      );
       await signInWithGoogle();
       if (auth.currentUser?.uid != null) {
         final docRef = FirestorePath.googleSignInPath(auth.currentUser!.uid);
@@ -75,8 +65,6 @@ class Authentication {
                 },
               );
             }
-            context.pop();
-            context.goNamed(AppRoutes.home.name);
           },
         );
       }
@@ -101,7 +89,7 @@ class Authentication {
             'username': username,
             'userPhoneNumber': 'Add phone number...',
           },
-        ).whenComplete(() => context.goNamed(AppRoutes.home.name));
+        ).whenComplete(() => context.pushNamed(AppRoutes.home.name));
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -122,8 +110,8 @@ final authenticationProvider = Provider.autoDispose<Authentication?>((ref) {
   }
 });
 
-final loggedInUserUidProvider = Provider<String?>(((ref) {
-  final loggedInUser = ref.read(authenticationProvider);
+final loggedInUserUidProvider = Provider.autoDispose<String?>(((ref) {
+  final loggedInUser = ref.watch(authenticationProvider);
   late final String? loggedInUserUid = loggedInUser?.uid;
   return loggedInUserUid;
 }));

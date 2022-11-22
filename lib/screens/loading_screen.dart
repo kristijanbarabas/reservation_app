@@ -11,17 +11,17 @@ import 'package:reservation_app/services/firestore_path.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'booking_calendar.dart';
 
-class HomeScreen extends StatefulWidget {
+class LoadingScreen extends StatefulWidget {
   static const String id = 'home_screen';
-  const HomeScreen({
+  const LoadingScreen({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _LoadingScreenState extends State<LoadingScreen> {
   bool isLoading = true;
 
   // TODO add path and refactor code

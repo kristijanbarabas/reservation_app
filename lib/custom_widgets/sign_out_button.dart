@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:reservation_app/routing/app_router.dart';
+import 'package:reservation_app/routing/go_router.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../services/constants.dart';
 
@@ -18,7 +18,7 @@ class SignOutButton extends StatelessWidget {
     // Function to signout the user
     void signoutUser() {
       try {
-        auth.signOut();
+        auth.signOut().whenComplete(() => Navigator.pop(context));
       } catch (e) {
         Alert(
             context: context,
@@ -39,7 +39,6 @@ class SignOutButton extends StatelessWidget {
             DialogButton(
               onPressed: () {
                 signoutUser();
-                context.pushNamed(AppRoutes.welcome.name);
               },
               color: kButtonColor,
               child: const Text(
@@ -63,5 +62,10 @@ class SignOutButton extends StatelessWidget {
         child: FaIcon(FontAwesomeIcons.rightFromBracket),
       ),
     );
+  }
+
+  @override
+  void dismiss(context) {
+    Navigator.pop(context);
   }
 }

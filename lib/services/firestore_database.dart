@@ -71,6 +71,7 @@ class FirestoreDatabase {
     );
   }
 
+  // TODO add a alert to notify the user that the data/account has been deleted
   deleteAllUserDataAndReservations() async {
     await deleteUser();
     await deleteUserProfile();

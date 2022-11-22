@@ -29,7 +29,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: const Icon(Icons.arrow_back)),
         automaticallyImplyLeading: false,
         title: Text(
-          kRegisterTitle,
+          kSignUp,
           style: kGoogleFonts,
         ),
         centerTitle: true,
@@ -96,15 +96,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 decoration:
                     kTextFieldDecoration.copyWith(hintText: kHintTextUsername)),
             // REGISTER BUTTON
-            GestureDetector(
-              onTap: () {
-                print(username);
-              },
-              child: RegisterButton(
-                email: email,
-                password: password,
-                username: username,
-              ),
+            RegisterButton(
+              email: email,
+              password: password,
+              username: username,
             ),
           ],
         ),

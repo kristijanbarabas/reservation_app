@@ -2,6 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestorePath {
   static String userProfile(String uid) => 'user/$uid/profile/$uid';
+
+  static DocumentReference userProfilePath(String uid) {
+    final firestore = FirebaseFirestore.instance;
+    return firestore.collection('user').doc(uid).collection('profile').doc(uid);
+  }
+
   static CollectionReference getAndDeleteExpiredReservationPath() {
     final firestore = FirebaseFirestore.instance;
     return firestore

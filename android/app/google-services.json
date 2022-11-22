@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "57805998364-0sdeethqvmjr8t5odu7t8g7k12g8mean.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kiki.reservation_app",
+            "certificate_hash": "60d9c7ddd6c1f76246240185cf98f48f7eabbb34"
+          }
+        },
+        {
           "client_id": "57805998364-r6vrah4n74eqo8tiq57bp4c3tm7ncl75.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -1,10 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import '../routing/app_router.dart';
 import '../services/constants.dart';
 
 class DeleteUserAccountAndData extends ConsumerWidget {
@@ -13,6 +12,7 @@ class DeleteUserAccountAndData extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final database = ref.watch(databaseProvider);
+    final auth = FirebaseAuth.instance;
 
     return FloatingActionButton(
       onPressed: () {
@@ -26,7 +26,7 @@ class DeleteUserAccountAndData extends ConsumerWidget {
             DialogButton(
               onPressed: () {
                 database!.deleteAllUserDataAndReservations();
-                context.pushNamed(AppRoutes.welcome.name);
+                auth.signOut().whenComplete(() => Navigator.pop(context));
               },
               color: kButtonColor,
               child: const Text(
@@ -36,6 +36,7 @@ class DeleteUserAccountAndData extends ConsumerWidget {
             ),
             DialogButton(
               onPressed: () {
+                //TODO navigator pop
                 Navigator.pop(context);
               },
               color: kButtonColor,

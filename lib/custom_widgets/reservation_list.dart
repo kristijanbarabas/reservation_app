@@ -13,6 +13,7 @@ class ReservationList extends StatelessWidget {
       builder: ((context, ref, child) {
         final firestoreDatabase = ref.watch(databaseProvider);
         final reservationsList = ref.watch(userReservationProvider);
+
         return AsyncValueWidget<List<ReservationDetails>>(
           value: reservationsList,
           data: (userReservations) {
@@ -22,6 +23,7 @@ class ReservationList extends StatelessWidget {
                   return GestureDetector(
                     // Route to reservation details screen
                     onTap: () {
+                      // TODO go router
                       /*  Navigator.push(
                                           context,
                                           MaterialPageRoute(
