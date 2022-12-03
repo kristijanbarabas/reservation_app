@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:reservation_app/services/firestore_path.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -48,6 +47,11 @@ class Authentication {
 
   // Full google sign in function that displays a loading animation while checking if the user has already signed in before
   void customSignInWithGoogle(BuildContext context) async {
+    final data = {
+      'username': auth.currentUser?.displayName,
+      'phoneNumber': auth.currentUser?.phoneNumber,
+      'userProfilePicture': auth.currentUser?.photoURL,
+    };
     try {
       await signInWithGoogle();
       if (auth.currentUser?.uid != null) {
@@ -57,13 +61,7 @@ class Authentication {
             if (document.exists) {
               // Do nothing
             } else {
-              docRef.set(
-                {
-                  'username': auth.currentUser?.displayName,
-                  'phoneNumber': auth.currentUser?.phoneNumber,
-                  'userProfilePicture': auth.currentUser?.photoURL,
-                },
-              );
+              docRef.set(data);
             }
           },
         );
@@ -80,21 +78,26 @@ class Authentication {
       required String? username,
       required BuildContext context}) async {
     final auth = FirebaseAuth.instance;
+    final data = {
+      'username': username,
+      'userPhoneNumber': 'Add phone number...',
+    };
     try {
       final newUser = await auth.createUserWithEmailAndPassword(
           email: email!, password: password!);
       if (newUser != null) {
-        FirestorePath.userProfileDocumentPath(newUser.user!.uid).set(
-          {
-            'username': username,
-            'userPhoneNumber': 'Add phone number...',
-          },
-        ).whenComplete(() => context.pushNamed(AppRoutes.home.name));
+        FirestorePath.userProfileDocumentPath(newUser.user!.uid)
+            .set(data)
+            .whenComplete(() => context.pushNamed(AppRoutes.home.name));
       }
     } catch (e) {
-      debugPrint(e.toString());
       Alert(context: context, title: "Error", desc: "Try again!").show();
     }
+  }
+
+  // Signout the user
+  signOutUser({required BuildContext context}) {
+    auth.signOut().whenComplete(() => Navigator.pop(context));
   }
 }
 

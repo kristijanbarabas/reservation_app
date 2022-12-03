@@ -79,8 +79,9 @@ class ProfileDataBottomSheet extends StatelessWidget {
                     CustomRoundedButton(
                         title: kSubmit,
                         onPressed: () {
-                          database!.updateProfile(userProfile.username,
-                              userProfile.userPhoneNumber);
+                          database!.updateProfile(
+                              username: userProfile.username,
+                              userPhoneNumber: userProfile.userPhoneNumber);
                           Navigator.pop(context);
                         },
                         textStyle: kMainMenuFonts,

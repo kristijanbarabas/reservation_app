@@ -2,13 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestorePath {
   static String userProfile(String uid) => 'user/$uid/profile/$uid';
+  //static String userReservations(String uid) => 'user/reservation/reservation';
 
   static DocumentReference userProfilePath(String uid) {
     final firestore = FirebaseFirestore.instance;
     return firestore.collection('user').doc(uid).collection('profile').doc(uid);
   }
 
-  static CollectionReference getAndDeleteExpiredReservationPath() {
+  static CollectionReference userReservationsPath() {
     final firestore = FirebaseFirestore.instance;
     return firestore
         .collection('user')
@@ -59,7 +60,7 @@ class FirestorePath {
         .collection('user')
         .doc('reservation')
         .collection('reservation')
-        .where('bookingEnd', isEqualTo: bookingStart);
+        .where('bookingStart', isEqualTo: bookingStart);
   }
 
   static Query<Map<String, dynamic>> deleteUserReservationsPath(String uid) {

@@ -22,7 +22,8 @@ class FirestoreDatabase {
       );
 
   // User reservation profile data stream
-  Stream<List<ReservationDetails>> reservationsStream() => _service.queryStream(
+  Stream<List<ReservationDetails>> reservationsStream() =>
+      _service.reservationListStream(
         query: FirestorePath.reservationQueryPath(uid!),
         builder: (data) => data,
       );
@@ -42,10 +43,11 @@ class FirestoreDatabase {
   }
 
   // Update profile
-  updateProfile(String? username, String? userPhoneNumber) async {
+  Future<void> updateProfile(
+      {required String? username, required String? userPhoneNumber}) {
     final docRef = FirestorePath.updateUserProfilePath(_auth.currentUser!.uid);
-    await docRef.set({'username': username, 'userPhoneNumber': userPhoneNumber},
-        SetOptions(merge: true));
+    final data = {'username': username, 'userPhoneNumber': userPhoneNumber};
+    return docRef.set(data, SetOptions(merge: true));
   }
 
   // Delete user profile and all data

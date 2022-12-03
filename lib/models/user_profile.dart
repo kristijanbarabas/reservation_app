@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 @immutable
 class UserProfile extends Equatable {
+  // TODO remove late and add final?
   final String userId;
   late String? username;
   late String? userPhoneNumber;

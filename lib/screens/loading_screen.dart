@@ -41,7 +41,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void getDataAndDeleteExpiredReservation() async {
-    final docRef = FirestorePath.getAndDeleteExpiredReservationPath().get();
+    final docRef = FirestorePath.userReservationsPath().get();
     await docRef.then(
       (QuerySnapshot snapshot) {
         for (var documentSnapshot in snapshot.docs) {
@@ -145,8 +145,8 @@ class _TestState extends ConsumerState<Test> {
     }
   }
 
-  void getDataAndDeleteExpiredReservation() async {
-    final docRef = FirestorePath.getAndDeleteExpiredReservationPath().get();
+  getDataAndDeleteExpiredReservation() async {
+    final docRef = FirestorePath.userReservationsPath().get();
     await docRef.then(
       (QuerySnapshot snapshot) {
         for (var documentSnapshot in snapshot.docs) {

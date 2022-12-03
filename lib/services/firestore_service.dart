@@ -61,7 +61,7 @@ class FirestoreService {
     return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id));
   }
 
-  Stream<T> queryStream<T>({
+  Stream<T> reservationListStream<T>({
     required Query<Map<String, dynamic>> query,
     required T Function(List<ReservationDetails> data) builder,
   }) {
@@ -69,8 +69,8 @@ class FirestoreService {
     final Query<Map<String, dynamic>> reference = query;
     final Stream<QuerySnapshot<Map<String, dynamic>>> snapshots =
         reference.snapshots();
-    return snapshots.map((event) {
-      final allReservations = event.docs;
+    return snapshots.map((querySnapshot) {
+      final allReservations = querySnapshot.docs;
       List<ReservationDetails> reservationList = [];
       for (var reservation in allReservations) {
         fireData = reservation.data();

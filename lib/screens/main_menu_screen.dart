@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/custom_widgets/app_bar_username.dart';
 import 'package:reservation_app/custom_widgets/reservation_list.dart';
 import 'package:reservation_app/custom_widgets/sign_out_button.dart';
 import 'package:reservation_app/services/constants.dart';
 import '../custom_widgets/app_bar_profile_picture.dart';
+import '../services/firestore_path.dart';
 
 class MainMenu extends StatelessWidget {
   static const String id = 'menu_screen';
@@ -54,6 +56,7 @@ class MainMenu extends StatelessWidget {
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.white),
                       borderRadius: BorderRadius.circular(10.0)),
+                  // User reservations list
                   child: const ReservationList()),
             ),
             const SizedBox(
