@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reservation_app/custom_widgets/sign_in_button.dart';
 import 'package:reservation_app/routing/go_router.dart';
 import '../services/constants.dart';
 import 'package:reservation_app/custom_widgets/google_sign_in.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -17,24 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
   // User data
   late String? email = '';
   late String? password = '';
+  final obscureTextProviderSignIn = StateProvider<bool>((ref) => false);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /* appBar: AppBar(
-        leading: GestureDetector(
-            onTap: () {
-              GoRouter.of(context).pop();
-            },
-            child: const Icon(Icons.arrow_back)),
-        automaticallyImplyLeading: false,
-        title: Text(
-          kLoginTitle,
-          style: kGoogleFonts,
-        ),
-        centerTitle: true,
-        backgroundColor: kButtonColor,
-      ), */
       backgroundColor: kBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -71,17 +60,38 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8.0,
             ),
             // Password input
-            TextField(
-                style: kTextFieldInputStyle,
-                obscureText: true,
-                textAlign: TextAlign.center,
-                onChanged: (value) {
-                  setState(() {
-                    password = value;
-                  });
-                },
-                decoration:
-                    kTextFieldDecoration.copyWith(hintText: kHintTextPassword)),
+            Consumer(
+              builder: ((context, ref, child) {
+                final passwordVisibility = ref.watch(obscureTextProviderSignIn);
+                return TextField(
+                  style: kTextFieldInputStyle,
+                  obscureText: passwordVisibility,
+                  textAlign: TextAlign.center,
+                  onChanged: (value) {
+                    setState(() {
+                      password = value;
+                    });
+                  },
+                  decoration: kTextFieldPasswordDecoration.copyWith(
+                      hintText: kHintTextPassword,
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            ref
+                                .read(obscureTextProviderSignIn.state)
+                                .update((state) => !state);
+                          },
+                          icon: passwordVisibility == true
+                              ? const Icon(
+                                  FontAwesomeIcons.eyeSlash,
+                                  color: Colors.white,
+                                )
+                              : const Icon(
+                                  FontAwesomeIcons.eye,
+                                  color: Colors.white,
+                                ))),
+                );
+              }),
+            ),
             const SizedBox(
               height: 24.0,
             ),

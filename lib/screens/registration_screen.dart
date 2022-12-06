@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reservation_app/custom_widgets/register_button.dart';
 import '../services/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const String id = 'registration_screen';
@@ -17,7 +19,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late String? email = '';
   late String? password = '';
   late String? username = '';
-
+  final obscureTextProviderRegister = StateProvider<bool>((ref) => false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,17 +73,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               height: 8.0,
             ),
             // PASSWORD INPUT
-            TextField(
-                style: kTextFieldInputStyle,
-                obscureText: true,
-                textAlign: TextAlign.center,
-                onChanged: (value) {
-                  setState(() {
-                    password = value;
-                  });
-                },
-                decoration:
-                    kTextFieldDecoration.copyWith(hintText: kHintTextPassword)),
+            Consumer(
+              builder: ((context, ref, child) {
+                bool passwordVisibility =
+                    ref.watch(obscureTextProviderRegister);
+                return TextField(
+                  style: kTextFieldInputStyle,
+                  obscureText: passwordVisibility,
+                  textAlign: TextAlign.center,
+                  onChanged: (value) {
+                    setState(() {
+                      password = value;
+                    });
+                  },
+                  decoration: kTextFieldPasswordDecoration.copyWith(
+                      hintText: kHintTextPassword,
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            ref
+                                .read(obscureTextProviderRegister.state)
+                                .update((state) => !state);
+                          },
+                          icon: passwordVisibility == true
+                              ? const Icon(
+                                  FontAwesomeIcons.eyeSlash,
+                                  color: Colors.white,
+                                )
+                              : const Icon(
+                                  FontAwesomeIcons.eye,
+                                  color: Colors.white,
+                                ))),
+                );
+              }),
+            ),
             const SizedBox(
               height: 8.0,
             ),

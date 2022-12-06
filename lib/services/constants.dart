@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // Delete reservation hint text
@@ -66,6 +67,27 @@ var kTextFieldDecoration = InputDecoration(
   ),
 );
 
+var kTextFieldPasswordDecoration = InputDecoration(
+  hintStyle: GoogleFonts.roboto(
+    color: Colors.white.withOpacity(0.5),
+  ),
+  labelStyle: GoogleFonts.roboto(
+    color: Colors.white.withOpacity(0.5),
+  ),
+  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+  border: const OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(32.0)),
+  ),
+  enabledBorder: const OutlineInputBorder(
+    borderSide: BorderSide(color: kButtonColor, width: 1.0),
+    borderRadius: BorderRadius.all(Radius.circular(32.0)),
+  ),
+  focusedBorder: const OutlineInputBorder(
+    borderSide: BorderSide(color: kButtonColor, width: 2.0),
+    borderRadius: BorderRadius.all(Radius.circular(32.0)),
+  ),
+);
+
 // GOOGLE LOG-ING TEXT
 TextStyle kGoogleLoginStyle = GoogleFonts.roboto(
     fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.w500);
@@ -78,5 +100,5 @@ TextStyle kReservationDetails = GoogleFonts.roboto(
 // dropdownbutton list
 
 // RESERVATION TEXT
-
+const String kReservationsTitle = 'Your Reservations:';
 const kReservationText = TextStyle(fontSize: 26.0);

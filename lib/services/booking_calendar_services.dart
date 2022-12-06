@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -37,53 +39,6 @@ class BookingCalendarServices {
         .snapshots();
   }
 
-  Future<dynamic> uploadBooking(
-    BuildContext context, {
-    required BookingService newBooking,
-  }) async {
-    await FirestorePath.userReservationsPath()
-        .add(newBooking.toJson())
-        .whenComplete(() {
-      Alert(
-        context: context,
-        type: AlertType.success,
-        title: "SUCCESS!",
-        desc: "Your reservation has been added.",
-        buttons: [
-          DialogButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            width: 120,
-            child: const Text(
-              "OK",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ],
-      ).show();
-    }).catchError((error) {
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "ERROR!",
-        desc: "Something went wrong! Try again!",
-        buttons: [
-          DialogButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            width: 120,
-            child: const Text(
-              "OK",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ],
-      ).show();
-    });
-  }
-
   DateTime dateNow = DateTime.now();
   late DateTime startDate =
       DateTime(dateNow.year, dateNow.month, dateNow.day, 0);
@@ -105,26 +60,27 @@ class BookingCalendarServices {
   }
 
   late DateTimeRange reservationWidget;
-  List<DateTimeRange> convertedDateTimeRange = [];
+
   // List of booked appontiments required by the package
-  List<DateTimeRange> convertedStreamResult({required dynamic streamResult}) {
+  Stream<List<DateTimeRange>> convertedStreamResult() {
+    List<DateTimeRange> convertedDateTimeRange = [];
     final stream = FirestorePath.userReservationsPath().snapshots();
-    stream.listen((querySnapshot) {
+    return stream.map((querySnapshot) {
       final allReservations = querySnapshot.docs;
-      for (var reservation in allReservations) {
-        late Map<String, dynamic> fireData =
-            reservation.data() as Map<String, dynamic>;
-        final reservations = Reservations.fromMap(fireData);
+      allReservations.map((reservation) {
+        // TODO test if it's the same as using a for loop
+        final reservations =
+            Reservations.fromMap(reservation.data() as Map<String, dynamic>);
         final String reservationTime = reservations.bookingStart!;
         final DateTime parsedReservationTime = DateTime.parse(reservationTime);
         final reservationDate = reservations.bookingEnd!;
         final DateTime parsedReservationDate = DateTime.parse(reservationDate);
         reservationWidget = DateTimeRange(
             start: parsedReservationTime, end: parsedReservationDate);
-        convertedDateTimeRange.add(reservationWidget);
-      }
+        return convertedDateTimeRange.add(reservationWidget);
+      }).toList();
+      return convertedDateTimeRange;
     });
-    return convertedDateTimeRange;
   }
 }
 
@@ -136,4 +92,11 @@ final bookingCalendarServices =
   } else {
     return null;
   }
+});
+
+final dateTimeRangeProvider =
+    StreamProvider.autoDispose<List<DateTimeRange>>((ref) {
+  final bookingCalendarFunctions = ref.watch(bookingCalendarServices);
+  final dateTimeRangeList = bookingCalendarFunctions!.convertedStreamResult();
+  return dateTimeRangeList;
 });

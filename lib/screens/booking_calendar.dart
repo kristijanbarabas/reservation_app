@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/services/booking_calendar_services.dart';
 import 'package:reservation_app/services/firestore_path.dart';
@@ -86,24 +87,41 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final bookingServicesProvider = ref.watch(bookingCalendarServices);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
-        child: BookingCalendar(
-          convertStreamResultToDateTimeRanges:
-              bookingServicesProvider!.convertedStreamResult,
-          bookingService: bookingService,
-          getBookingStream: bookingServicesProvider.getBookingStreamFirebase,
-          uploadBooking: uploadBooking,
-          bookingButtonText: 'SUBMIT',
-          bookingButtonColor: kButtonColor,
-          loadingWidget: const CustomLoadingWidget(),
-          uploadingWidget: const CustomLoadingWidget(),
-          startingDayOfWeek: StartingDayOfWeek.monday,
-          bookingGridCrossAxisCount: 2,
-          disabledDays: const [6, 7],
-          pauseSlots: bookingServicesProvider.generatePauseSlots(),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final convertedDateTimeRangeList = ref.watch(dateTimeRangeProvider);
+            final bookingServicesProvider = ref.watch(bookingCalendarServices);
+            return AsyncValueWidget<List<DateTimeRange>>(
+                value: convertedDateTimeRangeList,
+                data: (data) {
+                  final List<DateTimeRange> dateTimeRangeList =
+                      convertedDateTimeRangeList.value!;
+                  List<DateTimeRange> convertedDateTimeRange(
+                      {required dynamic streamResult}) {
+                    print(dateTimeRangeList);
+                    return dateTimeRangeList;
+                  }
+
+                  return BookingCalendar(
+                    convertStreamResultToDateTimeRanges: convertedDateTimeRange,
+                    bookingService: bookingService,
+                    getBookingStream:
+                        bookingServicesProvider!.getBookingStreamFirebase,
+                    uploadBooking: uploadBooking,
+                    bookingButtonText: 'SUBMIT',
+                    bookingButtonColor: kButtonColor,
+                    loadingWidget: const CustomLoadingWidget(),
+                    uploadingWidget: const CustomLoadingWidget(),
+                    startingDayOfWeek: StartingDayOfWeek.monday,
+                    bookingGridCrossAxisCount: 2,
+                    disabledDays: const [6, 7],
+                    pauseSlots: bookingServicesProvider.generatePauseSlots(),
+                  );
+                });
+          },
         ),
       ),
     );

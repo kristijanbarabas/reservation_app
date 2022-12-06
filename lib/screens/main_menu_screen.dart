@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:reservation_app/custom_widgets/app_bar_username.dart';
 import 'package:reservation_app/custom_widgets/reservation_list.dart';
 import 'package:reservation_app/custom_widgets/sign_out_button.dart';
 import 'package:reservation_app/services/constants.dart';
 import '../custom_widgets/app_bar_profile_picture.dart';
-import '../services/firestore_path.dart';
 
 class MainMenu extends StatelessWidget {
   static const String id = 'menu_screen';
@@ -29,6 +27,7 @@ class MainMenu extends StatelessWidget {
         // Username
         title: const AppBarUsernameWidget(),
         actions: const [
+          // Signout button
           SignOutButton(),
         ],
       ),
@@ -41,9 +40,12 @@ class MainMenu extends StatelessWidget {
             Expanded(
               child: Container(
                 alignment: Alignment.bottomLeft,
-                child: Text(
-                  'Your Reservations:',
-                  style: kMainMenuFonts.copyWith(fontSize: 30.0),
+                child: GestureDetector(
+                  onTap: (() => showAboutDialog(context: context)),
+                  child: Text(
+                    kReservationsTitle,
+                    style: kMainMenuFonts.copyWith(fontSize: 30.0),
+                  ),
                 ),
               ),
             ),
