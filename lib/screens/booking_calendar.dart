@@ -101,7 +101,6 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
                       convertedDateTimeRangeList.value!;
                   List<DateTimeRange> convertedDateTimeRange(
                       {required dynamic streamResult}) {
-                    print(dateTimeRangeList);
                     return dateTimeRangeList;
                   }
 

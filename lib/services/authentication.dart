@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:lottie/lottie.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:reservation_app/services/firestore_path.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -23,7 +24,12 @@ class Authentication {
     try {
       await auth.signInWithEmailAndPassword(email: email!, password: password!);
     } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
+      Alert(
+              context: context,
+              image: Lottie.asset('assets/wrong.json'),
+              title: "Something went wrong...",
+              desc: "Try again!")
+          .show();
     }
   }
 

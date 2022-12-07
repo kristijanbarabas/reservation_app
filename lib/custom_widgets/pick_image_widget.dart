@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/services/authentication.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -66,7 +67,7 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
         onTap: () {
           Alert(
             context: context,
-            type: AlertType.warning,
+            image: Lottie.asset('assets/santa.json', height: 150, width: 150),
             title: "PICK AN IMAGE!",
             buttons: [
               DialogButton(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reservation_app/services/constants.dart';
 
 class AsyncValueWidget<T> extends StatelessWidget {
   final AsyncValue<T> value;
@@ -14,7 +15,9 @@ class AsyncValueWidget<T> extends StatelessWidget {
               child: Text(error.toString()),
             ),
         loading: () => const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: kBackgroundColor,
+              ),
             ));
   }
 }

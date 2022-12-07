@@ -48,13 +48,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               child: Hero(
                 tag: kHeroTag,
                 child: SizedBox(
-                  height: 100,
+                  width: MediaQuery.of(context).size.width,
                   child: Image.asset(kLogoPath),
                 ),
               ),
             ),
             const SizedBox(
-              height: 78.0,
+              height: 54.0,
             ),
             // EMAIL INPUT
             TextField(
@@ -119,6 +119,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 },
                 decoration:
                     kTextFieldDecoration.copyWith(hintText: kHintTextUsername)),
+            const SizedBox(
+              height: 24.0,
+            ),
             // REGISTER BUTTON
             RegisterButton(
               email: email,

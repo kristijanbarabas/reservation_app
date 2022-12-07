@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../services/constants.dart';
 
@@ -30,7 +31,7 @@ class SignOutButton extends StatelessWidget {
       onTap: () {
         Alert(
           context: context,
-          type: AlertType.warning,
+          image: Lottie.asset('assets/warning.json', height: 100, width: 100),
           title: "SIGN OUT!",
           desc: "Are you sure?",
           buttons: [
