@@ -18,7 +18,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   // New user data
   late String? email = '';
   late String? password = '';
-  late String? username = '';
+  late String? firstName = '';
+  late String? lastName = '';
   final obscureTextProviderRegister = StateProvider<bool>((ref) => false);
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             TextField(
               style: kTextFieldInputStyle,
               keyboardType: TextInputType.emailAddress,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
               onChanged: (value) {
                 setState(() {
                   email = value;
@@ -80,7 +81,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 return TextField(
                   style: kTextFieldInputStyle,
                   obscureText: passwordVisibility,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   onChanged: (value) {
                     setState(() {
                       password = value;
@@ -111,14 +112,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             TextField(
                 style: kTextFieldInputStyle,
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.start,
                 onChanged: (value) {
                   setState(() {
-                    username = value;
+                    firstName = value;
                   });
                 },
-                decoration:
-                    kTextFieldDecoration.copyWith(hintText: kHintTextUsername)),
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: 'Enter your firstname...')),
+            const SizedBox(
+              height: 8.0,
+            ),
+            TextField(
+                style: kTextFieldInputStyle,
+                textAlign: TextAlign.start,
+                onChanged: (value) {
+                  setState(() {
+                    lastName = value;
+                  });
+                },
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: 'Enter your lastname...')),
             const SizedBox(
               height: 24.0,
             ),
@@ -126,7 +140,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             RegisterButton(
               email: email,
               password: password,
-              username: username,
+              firstName: firstName,
+              lastName: lastName,
             ),
           ],
         ),

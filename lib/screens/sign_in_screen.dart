@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               style: kTextFieldInputStyle,
               keyboardType: TextInputType.emailAddress,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
               onChanged: (value) {
                 setState(() {
                   email = value;
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 return TextField(
                   style: kTextFieldInputStyle,
                   obscureText: passwordVisibility,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   onChanged: (value) {
                     setState(() {
                       password = value;

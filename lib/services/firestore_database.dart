@@ -33,6 +33,7 @@ class FirestoreDatabase {
     final docRef = FirestorePath.deleteReservationByQueryPath(bookingEnd).get();
     await docRef.then(
       (querySnapshot) {
+        // TODO add a map function?
         querySnapshot.docs.forEach(
           (doc) {
             doc.reference.delete();
@@ -44,9 +45,15 @@ class FirestoreDatabase {
 
   // Update profile
   Future<void> updateProfile(
-      {required String? username, required String? userPhoneNumber}) {
+      {required String? firstName,
+      required String? lastName,
+      required String? userPhoneNumber}) {
     final docRef = FirestorePath.updateUserProfilePath(_auth.currentUser!.uid);
-    final data = {'username': username, 'userPhoneNumber': userPhoneNumber};
+    final data = {
+      'firstName': firstName,
+      'lastName': lastName,
+      'userPhoneNumber': userPhoneNumber
+    };
     return docRef.set(data, SetOptions(merge: true));
   }
 
@@ -64,6 +71,7 @@ class FirestoreDatabase {
         FirestorePath.deleteUserReservationsPath(_auth.currentUser!.uid).get();
     await docRef.then(
       (querySnapshot) {
+        // TODO add map function?
         querySnapshot.docs.forEach(
           (doc) {
             doc.reference.delete();

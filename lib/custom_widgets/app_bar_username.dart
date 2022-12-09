@@ -18,10 +18,10 @@ class AppBarUsernameWidget extends StatelessWidget {
       return AsyncValueWidget<UserProfile>(
         value: userProfileAsyncValue,
         data: (userProfile) {
-          return userProfile.username == null
+          return userProfile.firstName == null
               ? const Text('Welcome!')
               : Text(
-                  'Welcome ${userProfile.username}!',
+                  'Welcome ${userProfile.firstName}!',
                   style: kMainMenuFonts,
                 );
         },

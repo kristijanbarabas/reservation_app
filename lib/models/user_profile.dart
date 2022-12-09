@@ -7,6 +7,8 @@ class UserProfile extends Equatable {
   final String userId;
   late String? username;
   late String? userPhoneNumber;
+  late String? firstName;
+  late String? lastName;
   final String? userProfilePicture;
 
   UserProfile({
@@ -14,6 +16,8 @@ class UserProfile extends Equatable {
     required this.username,
     required this.userPhoneNumber,
     required this.userProfilePicture,
+    required this.firstName,
+    required this.lastName,
   });
 
   @override
@@ -29,6 +33,8 @@ class UserProfile extends Equatable {
     final username = data['username'] as String?;
     final userPhoneNumber = data['userPhoneNumber'] as String?;
     final userProfilePicture = data['userProfilePicture'] as String?;
+    final firstName = data['firstName'] as String?;
+    final lastName = data['lastName'] as String?;
     /* if (username == null) {
       throw StateError('missing username for userId: $documentId');
     }
@@ -42,14 +48,18 @@ class UserProfile extends Equatable {
         userId: documentId,
         username: username,
         userPhoneNumber: userPhoneNumber,
-        userProfilePicture: userProfilePicture);
+        userProfilePicture: userProfilePicture,
+        firstName: firstName,
+        lastName: lastName);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'username': username,
       'userPhoneNumber': userPhoneNumber,
-      'userProfilePicture': userProfilePicture
+      'userProfilePicture': userProfilePicture,
+      'firstName': firstName,
+      'lastName': lastName,
     };
   }
 }

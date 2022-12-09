@@ -21,7 +21,7 @@ class PickImageWidget extends ConsumerStatefulWidget {
 class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
   //TODO refactor this shit
 
-  File? image;
+  File? imageFromFile;
 
   @override
   Widget build(BuildContext context) {
@@ -31,30 +31,29 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
 
     Future pickImage(source) async {
       try {
-        final image = await ImagePicker().pickImage(source: source);
+        final image =
+            await ImagePicker().pickImage(source: source, imageQuality: 85);
         if (image == null) return;
         final imagePermanent = File(image.path);
         setState(() {
-          this.image = imagePermanent;
+          imageFromFile = imagePermanent;
           debugPrint('image set as permanent');
         });
-        showDialog(
-            context: context,
-            builder: (context) {
-              return const CustomLoadingWidget();
-            });
+        paperplaneAlertDialog(context: context);
         await cloudFunctions
             .uploadFile(filePath: image.path, uid: loggedInUserUid!)
             .whenComplete(
+                () => cloudFunctions.uploadNewImageToFirebase(loggedInUserUid))
+            .whenComplete(
               () => Alert(
-                      context: context,
-                      title: "Success",
-                      desc: "Image uploaded!",
-                      type: AlertType.success)
-                  .show(),
+                style: const AlertStyle(isButtonVisible: false),
+                context: context,
+                image: Lottie.asset('assets/success.json'),
+                title: "Success",
+                desc: "Image uploaded!",
+              ).show(),
             )
             .whenComplete(() => Navigator.pop(context));
-        await cloudFunctions.uploadNewImageToFirebase(loggedInUserUid);
       } catch (e) {
         Alert(context: context, title: "Error", desc: "Try again!").show();
       }
@@ -105,4 +104,13 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
       ),
     );
   }
+}
+
+paperplaneAlertDialog({required BuildContext context}) {
+  Alert(
+          onWillPopActive: true,
+          context: context,
+          image: Lottie.asset('assets/paperplane.json'),
+          style: const AlertStyle(isButtonVisible: false))
+      .show();
 }

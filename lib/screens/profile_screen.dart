@@ -23,9 +23,13 @@ class ProfileScreen extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 showModalBottomSheet(
+                  isScrollControlled: true,
                   context: context,
                   builder: (BuildContext context) {
-                    return const ProfileDataBottomSheet();
+                    return Padding(
+                      padding: MediaQuery.of(context).viewInsets,
+                      child: const ProfileDataBottomSheet(),
+                    );
                   },
                 );
               },

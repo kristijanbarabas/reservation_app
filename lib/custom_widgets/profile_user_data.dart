@@ -51,9 +51,21 @@ class ProfileUserData extends StatelessWidget {
                 Align(
                   alignment: Alignment.center,
                   child: Text(
-                    userProfile.username == null
-                        ? 'Add a username number...'
-                        : userProfile.username!,
+                    userProfile.firstName == null
+                        ? 'Add a firstname...'
+                        : userProfile.firstName!,
+                    style: kMainMenuFonts,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    userProfile.lastName == null
+                        ? 'Add a lastname...'
+                        : userProfile.lastName!,
                     style: kMainMenuFonts,
                   ),
                 ),

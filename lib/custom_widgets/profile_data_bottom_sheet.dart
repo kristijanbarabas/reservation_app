@@ -34,6 +34,7 @@ class ProfileDataBottomSheet extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Stack(
                       children: [
@@ -61,11 +62,19 @@ class ProfileDataBottomSheet extends StatelessWidget {
                       ],
                     ),
                     CustomTextFormFieldWidget(
-                      initialValue: userProfile.username == null
-                          ? 'Add a username...'
-                          : userProfile.username!,
+                      initialValue: userProfile.firstName == null
+                          ? 'Add a firstname...'
+                          : userProfile.firstName!,
                       newValue: (value) {
-                        userProfile.username = value!;
+                        userProfile.firstName = value!;
+                      },
+                    ),
+                    CustomTextFormFieldWidget(
+                      initialValue: userProfile.lastName == null
+                          ? 'Add a lastname...'
+                          : userProfile.lastName!,
+                      newValue: (value) {
+                        userProfile.lastName = value!;
                       },
                     ),
                     CustomTextFormFieldWidget(
@@ -80,7 +89,8 @@ class ProfileDataBottomSheet extends StatelessWidget {
                         title: kSubmit,
                         onPressed: () {
                           database!.updateProfile(
-                              username: userProfile.username,
+                              firstName: userProfile.firstName,
+                              lastName: userProfile.lastName,
                               userPhoneNumber: userProfile.userPhoneNumber);
                           Navigator.pop(context);
                         },

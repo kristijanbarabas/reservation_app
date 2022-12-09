@@ -7,12 +7,15 @@ import '../services/constants.dart';
 class RegisterButton extends ConsumerWidget {
   final String? email;
   final String? password;
-  final String? username;
-  const RegisterButton(
-      {super.key,
-      required this.email,
-      required this.password,
-      required this.username});
+  final String? firstName;
+  final String? lastName;
+  const RegisterButton({
+    super.key,
+    required this.email,
+    required this.password,
+    required this.firstName,
+    required this.lastName,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,7 +28,8 @@ class RegisterButton extends ConsumerWidget {
       onPressed: () => registerNewUser!.registerNewUser(
           email: email,
           password: password,
-          username: username,
+          firstName: firstName,
+          lastName: lastName,
           context: context),
     );
   }

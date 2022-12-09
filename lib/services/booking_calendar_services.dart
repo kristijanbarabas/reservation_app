@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:reservation_app/services/firestore_path.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import '../models/reservation_data.dart';
 import '../models/reservations.dart';
 
 class BookingCalendarServices {
-  //TODO create a stream provider
   final _firestore = FirebaseFirestore.instance;
 
   ///This is how can you get the reference to your data from the collection, and serialize the data with the help of the Firestore [withConverter]. This function would be in your repository.
@@ -66,7 +64,6 @@ class BookingCalendarServices {
     return stream.map((querySnapshot) {
       final allReservations = querySnapshot.docs;
       allReservations.map((reservation) {
-        // TODO test if it's the same as using a for loop
         final reservations =
             Reservations.fromMap(reservation.data() as Map<String, dynamic>);
         final String reservationTime = reservations.bookingStart!;

@@ -2,11 +2,12 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
+import 'package:reservation_app/services/alerts.dart';
 import 'package:reservation_app/services/booking_calendar_services.dart';
 import 'package:reservation_app/services/firestore_path.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:booking_calendar/booking_calendar.dart';
 import 'package:reservation_app/services/constants.dart';
 
@@ -21,51 +22,6 @@ class CustomBookingCalendar extends ConsumerStatefulWidget {
 }
 
 class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
-  // TODO find a way to refactor this and move it to booking calendar services
-  Future<dynamic> uploadBooking({required BookingService newBooking}) async {
-    await FirestorePath.userReservationsPath()
-        .add(newBooking.toJson())
-        .whenComplete(() {
-      Alert(
-        context: context,
-        type: AlertType.success,
-        title: "SUCCESS!",
-        desc: "Your reservation has been added.",
-        buttons: [
-          DialogButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            width: 120,
-            child: const Text(
-              "OK",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ],
-      ).show();
-    }).catchError((error) {
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "ERROR!",
-        desc: "Something went wrong! Try again!",
-        buttons: [
-          DialogButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            width: 120,
-            child: const Text(
-              "OK",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ],
-      ).show();
-    });
-  }
-
   // Firebase authentification
   final _auth = FirebaseAuth.instance;
   // Booking service
@@ -87,6 +43,18 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO find a way to refactor this and move it to booking calendar services
+    CustomAlerts alerts = CustomAlerts(context);
+    Future<dynamic> uploadBooking({required BookingService newBooking}) async {
+      await FirestorePath.userReservationsPath()
+          .add(newBooking.toJson())
+          .whenComplete(() {
+        alerts.successAlertDialot(context: context);
+      }).catchError((error) {
+        alerts.errorAlertDialog(context: context);
+      });
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),

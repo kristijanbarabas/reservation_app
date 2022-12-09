@@ -43,7 +43,8 @@ class _GoogleSignInButtonState extends ConsumerState<GoogleSignInButton>
     _scale = 1 - _controller.value;
     return Center(
       child: GestureDetector(
-        onTap: () => customSignInWithGoogle!.customSignInWithGoogle(context),
+        onTap: () =>
+            customSignInWithGoogle!.customSignInWithGoogle(context: context),
         onTapDown: _tapDown,
         onTapUp: _tapUp,
         child: Transform.scale(

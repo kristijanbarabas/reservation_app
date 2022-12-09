@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:lottie/lottie.dart';
 import 'package:reservation_app/services/firestore_database.dart';
 import 'package:reservation_app/services/firestore_path.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import '../routing/go_router.dart';
+import 'package:reservation_app/services/alerts.dart';
 
 class Authentication {
   Authentication({this.uid});
@@ -24,12 +23,8 @@ class Authentication {
     try {
       await auth.signInWithEmailAndPassword(email: email!, password: password!);
     } catch (e) {
-      Alert(
-              context: context,
-              image: Lottie.asset('assets/wrong.json'),
-              title: "Something went wrong...",
-              desc: "Try again!")
-          .show();
+      CustomAlerts alerts = CustomAlerts(context);
+      alerts.errorAlertDialog(context: context);
     }
   }
 
@@ -52,9 +47,9 @@ class Authentication {
   }
 
   // Full google sign in function that displays a loading animation while checking if the user has already signed in before
-  void customSignInWithGoogle(BuildContext context) async {
+  void customSignInWithGoogle({required BuildContext context}) async {
     final data = {
-      'username': auth.currentUser?.displayName,
+      'firstName': auth.currentUser?.displayName,
       'phoneNumber': auth.currentUser?.phoneNumber,
       'userProfilePicture': auth.currentUser?.photoURL,
     };
@@ -73,7 +68,8 @@ class Authentication {
         );
       }
     } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
+      CustomAlerts alerts = CustomAlerts(context);
+      alerts.errorAlertDialog;
     }
   }
 
@@ -81,12 +77,14 @@ class Authentication {
   void registerNewUser(
       {required String? email,
       required String? password,
-      required String? username,
+      required String? firstName,
+      required String? lastName,
       required BuildContext context}) async {
     final auth = FirebaseAuth.instance;
     final data = {
-      'username': username,
       'userPhoneNumber': 'Add phone number...',
+      'firstName': firstName,
+      'lastName': lastName,
     };
     try {
       final newUser = await auth.createUserWithEmailAndPassword(
@@ -97,7 +95,8 @@ class Authentication {
             .whenComplete(() => context.pushNamed(AppRoutes.home.name));
       }
     } catch (e) {
-      Alert(context: context, title: "Error", desc: "Try again!").show();
+      CustomAlerts alerts = CustomAlerts(context);
+      alerts.errorAlertDialog;
     }
   }
 
