@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lottie/lottie.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
 import 'package:reservation_app/services/alerts.dart';
@@ -26,8 +25,36 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
   final _auth = FirebaseAuth.instance;
   // Booking service
   late BookingService bookingService;
-  // Today
-  DateTime dateNow = DateTime.now();
+
+  DateTime bookingStart() {
+    DateTime? bookingStartDate = DateTime.now();
+    if (bookingStartDate.weekday == DateTime.saturday) {
+      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day + 2, 8, 0);
+    } else if (bookingStartDate.weekday == DateTime.sunday) {
+      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day + 1, 8, 0);
+    } else {
+      DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day, 8, 0);
+    }
+    return bookingStartDate;
+  }
+
+  DateTime bookingEnd() {
+    DateTime? bookingEndDate = DateTime.now();
+    if (bookingEndDate.weekday == DateTime.saturday) {
+      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
+          bookingEndDate.day + 2, 16, 0);
+    } else if (bookingEndDate.weekday == DateTime.sunday) {
+      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
+          bookingEndDate.day + 1, 16, 0);
+    } else {
+      DateTime(
+          bookingEndDate.year, bookingEndDate.month, bookingEndDate.day, 16, 0);
+    }
+    return bookingEndDate;
+  }
 
   @override
   void initState() {
@@ -35,33 +62,34 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
     bookingService = BookingService(
       serviceName: 'Reservation Service',
       serviceDuration: 120,
-      bookingStart: DateTime(dateNow.year, dateNow.month, dateNow.day, 8, 0),
-      bookingEnd: DateTime(dateNow.year, dateNow.month, dateNow.day, 16, 0),
+      bookingStart: bookingStart(),
+      bookingEnd: bookingEnd(),
       userId: _auth.currentUser!.uid,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO find a way to refactor this and move it to booking calendar services
-    CustomAlerts alerts = CustomAlerts(context);
-    Future<dynamic> uploadBooking({required BookingService newBooking}) async {
-      await FirestorePath.userReservationsPath()
-          .add(newBooking.toJson())
-          .whenComplete(() {
-        alerts.successAlertDialot(context: context);
-      }).catchError((error) {
-        alerts.errorAlertDialog(context: context);
-      });
-    }
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Consumer(
+          // TODO find a way to refactor this and move it to booking calendar services
           builder: (context, ref, child) {
             final convertedDateTimeRangeList = ref.watch(dateTimeRangeProvider);
             final bookingServicesProvider = ref.watch(bookingCalendarServices);
+            final customAlerts = ref.watch(customAlertsProvider);
+            Future<dynamic> uploadBooking(
+                {required BookingService newBooking}) async {
+              await FirestorePath.userReservationsPath()
+                  .add(newBooking.toJson())
+                  .whenComplete(() {
+                customAlerts!.successAlertDialot(context: context);
+              }).catchError((error) {
+                customAlerts!.errorAlertDialog(context: context);
+              });
+            }
+
             return AsyncValueWidget<List<DateTimeRange>>(
                 value: convertedDateTimeRangeList,
                 data: (data) {

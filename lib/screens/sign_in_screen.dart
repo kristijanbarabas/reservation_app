@@ -35,13 +35,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Hero(
                 tag: kHeroTag,
                 child: SizedBox(
-                  height: 200,
+                  height: MediaQuery.of(context).size.width,
                   child: Image.asset(kLogoPath),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 54.0,
             ),
             // Email input
             TextField(
@@ -136,6 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+            const SizedBox(
+              height: 40.0,
+            )
           ],
         ),
       ),

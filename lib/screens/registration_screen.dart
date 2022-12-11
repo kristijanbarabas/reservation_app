@@ -119,7 +119,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   });
                 },
                 decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your firstname...')),
+                    hintText: 'Enter your first name...')),
             const SizedBox(
               height: 8.0,
             ),
@@ -132,7 +132,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   });
                 },
                 decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your lastname...')),
+                    hintText: 'Enter your last name...')),
             const SizedBox(
               height: 24.0,
             ),

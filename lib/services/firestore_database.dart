@@ -33,7 +33,6 @@ class FirestoreDatabase {
     final docRef = FirestorePath.deleteReservationByQueryPath(bookingEnd).get();
     await docRef.then(
       (querySnapshot) {
-        // TODO add a map function?
         querySnapshot.docs.forEach(
           (doc) {
             doc.reference.delete();

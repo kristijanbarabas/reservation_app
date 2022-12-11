@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
-import 'package:reservation_app/custom_widgets/loading_widget.dart';
+import 'package:reservation_app/services/alerts.dart';
 import 'package:reservation_app/services/authentication.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../services/cloud_firebase_storage.dart';
@@ -27,19 +27,21 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
   Widget build(BuildContext context) {
     final loggedInUserUid = ref.watch(loggedInUserUidProvider);
     final cloudFunctions = ref.watch(cloudStorageFunctions);
-    // TODO compress image before upload
+    final customAlerts = ref.watch(customAlertsProvider);
 
     Future pickImage(source) async {
       try {
-        final image =
-            await ImagePicker().pickImage(source: source, imageQuality: 85);
+        final image = await ImagePicker().pickImage(
+            source: source,
+            /* Lower image quality makes the image upload faster*/
+            imageQuality: 85);
         if (image == null) return;
         final imagePermanent = File(image.path);
         setState(() {
           imageFromFile = imagePermanent;
           debugPrint('image set as permanent');
         });
-        paperplaneAlertDialog(context: context);
+        customAlerts!.paperplaneAlertDialog(context: context);
         await cloudFunctions
             .uploadFile(filePath: image.path, uid: loggedInUserUid!)
             .whenComplete(
@@ -104,13 +106,4 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
       ),
     );
   }
-}
-
-paperplaneAlertDialog({required BuildContext context}) {
-  Alert(
-          onWillPopActive: true,
-          context: context,
-          image: Lottie.asset('assets/paperplane.json'),
-          style: const AlertStyle(isButtonVisible: false))
-      .show();
 }

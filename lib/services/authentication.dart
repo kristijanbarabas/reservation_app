@@ -13,6 +13,7 @@ class Authentication {
   Authentication({this.uid});
   final String? uid;
   FirebaseAuth auth = FirebaseAuth.instance;
+  final CustomAlerts _alerts = CustomAlerts();
 
   // Sign in with email
   Future<void> customSignInWithEmailAndPassword({
@@ -23,8 +24,7 @@ class Authentication {
     try {
       await auth.signInWithEmailAndPassword(email: email!, password: password!);
     } catch (e) {
-      CustomAlerts alerts = CustomAlerts(context);
-      alerts.errorAlertDialog(context: context);
+      _alerts.errorAlertDialog(context: context);
     }
   }
 
@@ -68,8 +68,7 @@ class Authentication {
         );
       }
     } catch (e) {
-      CustomAlerts alerts = CustomAlerts(context);
-      alerts.errorAlertDialog;
+      _alerts.errorAlertDialog(context: context);
     }
   }
 
@@ -87,7 +86,7 @@ class Authentication {
       'lastName': lastName,
     };
     try {
-      final newUser = await auth.createUserWithEmailAndPassword(
+      final UserCredential newUser = await auth.createUserWithEmailAndPassword(
           email: email!, password: password!);
       if (newUser != null) {
         FirestorePath.userProfileDocumentPath(newUser.user!.uid)
@@ -95,8 +94,7 @@ class Authentication {
             .whenComplete(() => context.pushNamed(AppRoutes.home.name));
       }
     } catch (e) {
-      CustomAlerts alerts = CustomAlerts(context);
-      alerts.errorAlertDialog;
+      _alerts.errorAlertDialog(context: context);
     }
   }
 
