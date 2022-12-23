@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/reservation_details.dart';
-import '../services/booking_calendar_services.dart';
+import 'package:reservation_app/routing/go_router.dart';
 import '../services/firestore_database.dart';
+import 'package:go_router/go_router.dart';
 
 class ReservationList extends StatelessWidget {
   const ReservationList({super.key});
@@ -23,23 +24,14 @@ class ReservationList extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     // Route to reservation details screen
-                    onTap: () {
-                      // TODO go router
-                      /*  Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: ((context) =>
-                                                ReservationScreen(
-                                                  reservationDate:
-                                                      reservationList[index]
-                                                          .reservationDate,
-                                                  reservationTime:
-                                                      reservationList[index]
-                                                          .reservationTime,
-                                                )),
-                                          ),
-                                        ); */
-                    },
+                    onTap: () =>
+                        context.goNamed(AppRoutes.details.name, params: {
+                      'reservationDate':
+                          userReservations[index].reservationDate,
+                      'reservationTime':
+                          userReservations[index].reservationTime,
+                    }),
+
                     // Delete function
                     child: Dismissible(
                       key: ValueKey(userReservations[index]),

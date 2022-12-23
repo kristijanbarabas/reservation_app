@@ -77,6 +77,37 @@ class BookingCalendarServices {
       return convertedDateTimeRange;
     });
   }
+
+  DateTime bookingStart() {
+    DateTime? bookingStartDate = DateTime.now();
+    if (bookingStartDate.weekday == DateTime.saturday) {
+      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day + 2, 8, 0);
+    } else if (bookingStartDate.weekday == DateTime.sunday) {
+      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day + 1, 8, 0);
+    } else {
+      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
+          bookingStartDate.day, 8, 0);
+    }
+    return bookingStartDate;
+  }
+
+  DateTime bookingEnd() {
+    DateTime? bookingEndDate = DateTime.now();
+    if (bookingEndDate.weekday == DateTime.saturday) {
+      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
+          bookingEndDate.day + 2, 16, 0);
+    } else if (bookingEndDate.weekday == DateTime.sunday) {
+      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
+          bookingEndDate.day + 1, 16, 0);
+    } else {
+      bookingEndDate = DateTime(
+          bookingEndDate.year, bookingEndDate.month, bookingEndDate.day, 16, 0);
+    }
+
+    return bookingEndDate;
+  }
 }
 
 final bookingCalendarServices =

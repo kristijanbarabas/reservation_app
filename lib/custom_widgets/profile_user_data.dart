@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reservation_app/custom_widgets/async_value_widget.dart';
 import 'package:reservation_app/custom_widgets/pick_image_widget.dart';
 import 'package:reservation_app/models/user_profile.dart';
+import 'package:reservation_app/services/authentication.dart';
 import 'package:reservation_app/services/constants.dart';
 import '../services/firestore_database.dart';
 import 'profile_picture_widget.dart';
@@ -16,8 +17,9 @@ class ProfileUserData extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = FirebaseAuth.instance;
     return Consumer(builder: (context, ref, child) {
+      final loggedInUserUid = ref.watch(loggedInUserUidProvider);
       final userProfileAsyncValue =
-          ref.watch(userProfileProvider(auth.currentUser?.uid));
+          ref.watch(userProfileProvider(loggedInUserUid));
       return AsyncValueWidget<UserProfile>(
         value: userProfileAsyncValue,
         data: (userProfile) {

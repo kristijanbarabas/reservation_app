@@ -47,14 +47,7 @@ class _PickImageWidgetState extends ConsumerState<PickImageWidget> {
             .whenComplete(
                 () => cloudFunctions.uploadNewImageToFirebase(loggedInUserUid))
             .whenComplete(
-              () => Alert(
-                style: const AlertStyle(isButtonVisible: false),
-                context: context,
-                image: Lottie.asset('assets/success.json'),
-                title: "Success",
-                desc: "Image uploaded!",
-              ).show(),
-            )
+                () => customAlerts.successAlertDialot(context: context))
             .whenComplete(() => Navigator.pop(context));
       } catch (e) {
         Alert(context: context, title: "Error", desc: "Try again!").show();

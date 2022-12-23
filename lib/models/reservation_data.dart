@@ -50,8 +50,8 @@ class ReservationData {
   /// Connect the generated [_$DataFromJson] function to the `fromJson`
   /// factory.
   factory ReservationData.fromJson(Map<String, dynamic> json) =>
-      _$DataFromJson(json);
+      _$ReservationDataFromJson(json);
 
   /// Connect the generated [_$DataToJson] function to the `toJson` method.
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  Map<String, dynamic> toJson() => _$ReservationDataToJson(this);
 }

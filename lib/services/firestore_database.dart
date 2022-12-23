@@ -7,6 +7,8 @@ import 'package:reservation_app/services/firestore_path.dart';
 import 'package:reservation_app/services/firestore_service.dart';
 import 'package:reservation_app/models/user_profile.dart';
 
+import '../models/pricelist.dart';
+
 class FirestoreDatabase {
   FirestoreDatabase({required this.uid});
   final String? uid;
@@ -29,7 +31,7 @@ class FirestoreDatabase {
       );
 
   // Delete a reservation from a list on swipe
-  void deleteReservationOnSwipe({required String bookingEnd}) async {
+  Future<void> deleteReservationOnSwipe({required String bookingEnd}) async {
     final docRef = FirestorePath.deleteReservationByQueryPath(bookingEnd).get();
     await docRef.then(
       (querySnapshot) {
@@ -57,20 +59,20 @@ class FirestoreDatabase {
   }
 
   // Delete user profile and all data
-  deleteUser() {
-    _auth.currentUser?.delete();
+  Future<void> deleteUser() {
+    return _auth.currentUser!.delete();
   }
 
-  deleteUserProfile() {
-    FirestorePath.userProfileDocumentPath(_auth.currentUser!.uid).delete();
+  Future<void> deleteUserProfile() {
+    return FirestorePath.userProfileDocumentPath(_auth.currentUser!.uid)
+        .delete();
   }
 
-  deleteUserReservations() async {
+  Future<void> deleteUserReservations() async {
     final docRef =
         FirestorePath.deleteUserReservationsPath(_auth.currentUser!.uid).get();
     await docRef.then(
       (querySnapshot) {
-        // TODO add map function?
         querySnapshot.docs.forEach(
           (doc) {
             doc.reference.delete();
@@ -85,6 +87,15 @@ class FirestoreDatabase {
     await deleteUser();
     await deleteUserProfile();
     await deleteUserReservations();
+  }
+
+  Future<List<Price>> getPricelist() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    var ref = db.collection('pricelist');
+    var snapshot = await ref.get();
+    var data = snapshot.docs.map((e) => e.data());
+    var pricelist = data.map((e) => Price.fromJson(e));
+    return pricelist.toList();
   }
 }
 
@@ -113,4 +124,9 @@ final userReservationProvider =
     StreamProvider.autoDispose<List<ReservationDetails>>((ref) {
   final database = ref.watch(databaseProvider);
   return database!.reservationsStream();
+});
+
+final pricelistProvider = FutureProvider.autoDispose<List<Price>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database!.getPricelist();
 });

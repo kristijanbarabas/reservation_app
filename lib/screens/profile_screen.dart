@@ -41,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
           ],
           title: Text(
             'Profile',
-            style: kMainMenuFonts,
+            style: kGoogleFonts.copyWith(fontSize: 30),
           ),
         ),
         body: const ProfileUserData());

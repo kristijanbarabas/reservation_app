@@ -3,6 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reservation_app/custom_widgets/loading_widget.dart';
+import 'package:reservation_app/screens/about.dart';
 import 'package:reservation_app/services/constants.dart';
 import 'package:reservation_app/screens/main_menu_screen.dart';
 import 'package:reservation_app/screens/profile_screen.dart';
@@ -71,11 +72,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
       color: Colors.white,
     ),
     const Icon(
-      Icons.add,
+      FontAwesomeIcons.calendarPlus,
       size: 30,
       color: Colors.white,
     ),
-    const FaIcon(
+    const Icon(
+      FontAwesomeIcons.locationCrosshairs,
+      size: 30,
+      color: Colors.white,
+    ),
+    const Icon(
       FontAwesomeIcons.person,
       size: 30,
       color: Colors.white,
@@ -85,6 +91,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   late List<Widget> screens = [
     const MainMenu(),
     const CustomBookingCalendar(),
+    const About(),
     const ProfileScreen(),
   ];
 

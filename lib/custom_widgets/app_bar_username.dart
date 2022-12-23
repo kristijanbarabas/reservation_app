@@ -22,7 +22,7 @@ class AppBarUsernameWidget extends StatelessWidget {
               ? const Text('Welcome!')
               : Text(
                   'Welcome ${userProfile.firstName}!',
-                  style: kMainMenuFonts,
+                  style: kGoogleFonts.copyWith(fontSize: 30),
                 );
         },
       );

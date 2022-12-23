@@ -26,35 +26,8 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
   // Booking service
   late BookingService bookingService;
 
-  DateTime bookingStart() {
-    DateTime? bookingStartDate = DateTime.now();
-    if (bookingStartDate.weekday == DateTime.saturday) {
-      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
-          bookingStartDate.day + 2, 8, 0);
-    } else if (bookingStartDate.weekday == DateTime.sunday) {
-      bookingStartDate = DateTime(bookingStartDate.year, bookingStartDate.month,
-          bookingStartDate.day + 1, 8, 0);
-    } else {
-      DateTime(bookingStartDate.year, bookingStartDate.month,
-          bookingStartDate.day, 8, 0);
-    }
-    return bookingStartDate;
-  }
-
-  DateTime bookingEnd() {
-    DateTime? bookingEndDate = DateTime.now();
-    if (bookingEndDate.weekday == DateTime.saturday) {
-      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
-          bookingEndDate.day + 2, 16, 0);
-    } else if (bookingEndDate.weekday == DateTime.sunday) {
-      bookingEndDate = DateTime(bookingEndDate.year, bookingEndDate.month,
-          bookingEndDate.day + 1, 16, 0);
-    } else {
-      DateTime(
-          bookingEndDate.year, bookingEndDate.month, bookingEndDate.day, 16, 0);
-    }
-    return bookingEndDate;
-  }
+  BookingCalendarServices bookingCalendarServicesObject =
+      BookingCalendarServices();
 
   @override
   void initState() {
@@ -62,9 +35,10 @@ class CustomBookingCalendarState extends ConsumerState<CustomBookingCalendar> {
     bookingService = BookingService(
       serviceName: 'Reservation Service',
       serviceDuration: 120,
-      bookingStart: bookingStart(),
-      bookingEnd: bookingEnd(),
+      bookingStart: bookingCalendarServicesObject.bookingStart(),
+      bookingEnd: bookingCalendarServicesObject.bookingEnd(),
       userId: _auth.currentUser!.uid,
+      serviceId: DateTime.now().toString(),
     );
   }
 

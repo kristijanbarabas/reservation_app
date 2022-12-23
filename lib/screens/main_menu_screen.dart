@@ -32,20 +32,16 @@ class MainMenu extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: Container(
                 alignment: Alignment.bottomLeft,
-                child: GestureDetector(
-                  onTap: (() => showAboutDialog(context: context)),
-                  child: Text(
-                    kReservationsTitle,
-                    style: kMainMenuFonts.copyWith(fontSize: 30.0),
-                  ),
+                child: Text(
+                  kReservationsTitle,
+                  style: kGoogleFonts.copyWith(fontSize: 30.0),
                 ),
               ),
             ),
@@ -53,7 +49,7 @@ class MainMenu extends StatelessWidget {
               height: 10,
             ),
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Container(
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.white),

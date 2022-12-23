@@ -23,7 +23,7 @@ final TextStyle kGoogleFonts = GoogleFonts.rancho(
       fontWeight: FontWeight.w700,
       letterSpacing: 2.0),
 );
-final TextStyle kMainMenuFonts = GoogleFonts.roboto(
+final TextStyle kMainMenuFonts = GoogleFonts.ubuntu(
   textStyle: const TextStyle(
       fontSize: 20.0, color: Colors.white, fontWeight: FontWeight.w700),
 );
